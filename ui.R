@@ -9,7 +9,7 @@ shinyUI(fluidPage(
         column(6,
                flowLayout(
                  verticalLayout(
-                    h4("Number of observations"),
+                    h3("Number of observations"),
                     numericInput("numberObservations",
                         "Choose the number of observations",
                         value = 0),
@@ -18,7 +18,7 @@ shinyUI(fluidPage(
                
                flowLayout(
                    verticalLayout(
-                       h4("Data Likelihood"),
+                       h3("Data Likelihood"),
                        selectInput("distribution_type",
                                    "Likelihood",
                                    selected = "",
@@ -49,15 +49,16 @@ shinyUI(fluidPage(
                
                flowLayout(
                    verticalLayout(
-                       h4("Prior distribucion"),
                        uiOutput("prior_parameters_norm")
                    )
               )
         ),
 
         column(6,
-               h4("Density Graphics"),
+               actionButton("buttonGraph", "Show graphic"),
+               uiOutput("GraphTitle"),
                plotOutput('distPlot')
+               
         )
     )
 ))
