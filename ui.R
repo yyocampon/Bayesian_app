@@ -22,7 +22,7 @@ shinyUI(fluidPage(
                        selectInput("distribution_type",
                                    "Likelihood",
                                    selected = "",
-                                   choices = c("","Normal","Binomial")
+                                   choices = c("","Normal")
                        ), 
                        
                        conditionalPanel(
@@ -36,6 +36,12 @@ shinyUI(fluidPage(
                                        "Variance: choose the scenario",
                                        selected = "",
                                        choices = c("","Known","Unknown")
+                           ),
+                           
+                           selectInput("conditioned means",
+                                       "Conditional mean:choose the scenario",
+                                       selected = "",
+                                       choices = c("","mean is conditional","mean isn't conditional")
                            ),
                            
                         uiOutput("data_parameters_norm")

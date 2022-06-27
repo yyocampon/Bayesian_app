@@ -54,7 +54,8 @@ fx_norm_n = function(t0,d,variance,yn,n){
     stat_function(fun = dnorm, args = list(mean = yn, sd = sigma/sqrt(n)),
                   size = 1.3,aes(color = "Verosimilitud"))+
     theme_bw()+
-    labs(color = "Type of distribution.")
+    labs(color = "Type of distribution.") + 
+    ggtitle("Known mean and unknown variance.")
 }
 
 shinyServer(function(input, output) {
@@ -107,7 +108,7 @@ shinyServer(function(input, output) {
   
   observeEvent(input$buttonGraph, {
     output$GraphTitle <- renderUI({
-      h4("Density chart",  align = "center")
+      h4("Normal conjugate model.",  align = "center")
     })
     
     output$distPlot<- renderPlot({
