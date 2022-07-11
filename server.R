@@ -3,8 +3,6 @@ library(invgamma)
 library(ggplot2)
 library(plotly)
 
-#https://comunidadbioinfo.github.io/cdsb2021_workflows/mi-primera-aplicaci%C3%B3n-shinyr.html
-
 #Funcion media conocida y varianza desconocida.
 fy_ivgamma <- function(a,b,theta,v,n,sigma_n){
 
@@ -85,7 +83,7 @@ shinyServer(function(input, output) {
                      value = 0,
                      min=0),
         sliderInput( 'v', label = h3("Choose the v"), min = 0.1, 
-                     max = 2, value = 1),
+                     max = 5, value = 1, step = 0.1),
         numericInput("sigma_n",
                      "Choose the sample sigma",
                      value = 0,
