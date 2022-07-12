@@ -12,7 +12,7 @@ shinyUI(fluidPage(
                     h3("Number of observations"),
                     numericInput("numberObservations",
                         "Choose the number of observations",
-                        value = 0),
+                        value = 0)
                  )
                ),
                
@@ -46,7 +46,7 @@ shinyUI(fluidPage(
                            
                         uiOutput("data_parameters_norm")
 
-                       ),
+                       )
                        
                        
     
@@ -63,7 +63,7 @@ shinyUI(fluidPage(
         column(6,
                actionButton("buttonGraph", "Show graphic"),
                uiOutput("GraphTitle"),
-               plotOutput('distPlot')
+               plotlyOutput('distPlot')
                
         )
     )
