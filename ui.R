@@ -38,10 +38,10 @@ shinyUI(fluidPage(
                                        choices = c("","Known","Unknown")
                            ),
                            
-                           selectInput("conditioned means",
+                           selectInput("conditioned_means",
                                        "Conditional mean:choose the scenario",
                                        selected = "",
-                                       choices = c("","mean is conditional","mean isn't conditional")
+                                       choices = c("","mean is conditional","mean is not conditional")
                            ),
                            
                         uiOutput("data_parameters_norm")

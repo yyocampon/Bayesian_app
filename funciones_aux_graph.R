@@ -3,7 +3,7 @@ library(invgamma)
 library(plotly)
 
 
-# Funciton to plot conjugate model with mean unkown -----------------------
+# Funci�n to plot conjugate model with mean unkown -----------------------
 
 fx_norm_n = function(t0,d,variance,yn,n){
   
@@ -11,12 +11,11 @@ fx_norm_n = function(t0,d,variance,yn,n){
   mu0 = mean(yn)+(d*sigma)
   ymin = min(c((yn - 4*sigma),(mu0-4*t0),(mu0-4*sigma)))
   ymax = max(c((yn + 4*sigma),(mu0+4*t0),(mu0+4*sigma)))
-  
   tn_2 = t0^2+(sigma^2)/(n)
   mn = (((yn*n)/sigma^2)+(mu0/(t0^2)))/((n/(sigma^2))+(1/(t0^2)))
   
-  
   xx = seq(ymin, ymax,length.out = 100000)
+
   fy1 = dnorm(x = xx,mean = mu0,sd = sigma)
   fy2 = dnorm(x = xx,mean = mn,sd = sqrt(tn_2))
   fy3 = dnorm(x = xx,mean = yn,sd = sigma/sqrt(n))
@@ -50,18 +49,19 @@ fy_ivgamma <- function(a,b,theta,v,n,sigma_n){
   xmin = min(c((theta - 4*sigma_n),(a-(4*b))))
   xmax = max(c((theta + 4*sigma_n),(a+(4*b))))
   xx = seq(xmin,xmax,length.out = 100000) ###### 100 a 500?
-  fy1 = dinvgamma(x = xx,shape = a,scale = 1/b) # apriori
-  fy2 = dinvgamma(x = xx,shape = v0_n,scale = 1/v_n) # posterior
+  xxig = xx[xx > 0]
+  fy1 = dinvgamma(x = xxig,shape = a,scale = 1/b) # apriori
+  fy2 = dinvgamma(x = xxig,shape = v0_n,scale = 1/v_n) # posterior
   fy3 = dnorm(x = xx,mean = theta,sd = sigma_n)
   
-  df1 = data.frame(xx,fy1)
-  df2 = data.frame(xx,fy2)
+  df1 = data.frame(xxig,fy1)
+  df2 = data.frame(xxig,fy2)
   df3 = data.frame(xx,fy3)
   
   line_types = c("A priori"=1,"Posterior"=3,"Likelihood" = 2)
-  p1 = ggplot(df1, aes(x = xx,y = fy1, colour="A priori")) + 
+  p1 = ggplot(df1, aes(x = xxig,y = fy1, colour="A priori")) + 
     geom_line(size = 1.4)+ # apriori
-    geom_line(data=df2, aes(x=xx,y=fy2, colour="Posterior"),size = 1.5)+ # posterior
+    geom_line(data=df2, aes(x=xxig,y=fy2, colour="Posterior"),size = 1.5)+ # posterior
     geom_line(data=df3, aes(x=xx,y=fy3, colour="Likelihood"),size = 1.3)+ # verosimilitud
     theme_bw()+
     labs(color = "Distribution.") + 
@@ -79,14 +79,14 @@ fy_ivgamma <- function(a,b,theta,v,n,sigma_n){
 ## Scenary 2:
 # Mean and variance unknown: prior distribution of the mean depends of variance
 
-f_norm_uni = function(y_barn, sigma_y, mu0, c, alpha_0, beta_0, n){
+f_norm_uni = function(y_barn, sigma_y, mu0, k0, alpha_0, beta_0, n){
   # y_barn: media para la verosimilitud (¿se toma la media muestral?)
   # sigma_y: varianza para la verosimilitud (¿se toma la varianza muestral?)
   # c = 1/kappa_0
   
   sigma_2 = rinvgamma(1,shape =  alpha_0,scale = 1/beta_0) # ¿sería la forma de generar el valor de sigma^2 para ingresarlo como parámetro de la apriori de theta?
   
-  kappa_0 = 1/c # Creencia a priori para theta
+  kappa_0 = 1/k0 # Creencia a priori para theta
   nu_0 = 2*alpha_0
   sigma0_2 = (2*beta_0)/nu_0
   nu_n = nu_0 + n
@@ -99,12 +99,12 @@ f_norm_uni = function(y_barn, sigma_y, mu0, c, alpha_0, beta_0, n){
   
   xmin = min(c((y_barn - 4*sigma_y),(alpha_0-(4*beta_0))))
   xmax = max(c((y_barn + 4*sigma_y),(alpha_0+(4*beta_0))))
-  xxnorm = seq(xmin,xmax,length.out = 10000)
+  xxnorm = seq(xmin,xmax,length.out = 100000)
   xxig = xxnorm[xxnorm > 0]
   # A priori for sigma^2:
   fy1 =  dinvgamma(x = xxig, shape =  alpha_0,scale = 1/beta_0)
   # A priori for theta given sigma^2:
-  fy2 = dnorm(x = xxnorm, mean = mu0, sd = sqrt(c*sigma_2))
+  fy2 = dnorm(x = xxnorm, mean = mu0, sd = sqrt(k0*sigma_2))
   # Verosimilitud:
   fy3 = dnorm(x = xxnorm, mean = y_barn, sd = sqrt(sigma_y))
   # Posterior marginal for sigma:

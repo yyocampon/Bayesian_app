@@ -4,19 +4,17 @@ library(ggplot2)
 library(plotly)
 
 # source where there are auxiliar funtions to plot densities
-
 source("funciones_aux_graph.R")
-
 
 shinyServer(function(input, output) {
   
   output$data_parameters_norm <- renderUI({
     h3("Prior distribution")
-    if(input$cono_parametros_med == 'Known' & input$cono_parametros_var == 'Unknown'){
+    if(input$cono_parametros_med == 'Known' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == 'mean is not conditional'){
       numericInput("mean","Choose the mean",
                    value = 0,
                    min = 0)
-    }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Known'){
+    }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Known' & input$conditioned_means == 'mean is not conditional'){
       numericInput("variance","Choose the variance",
                    value = 0,
                    min = 0)
@@ -25,36 +23,67 @@ shinyServer(function(input, output) {
   })
   
   output$prior_parameters_norm <- renderUI({
-    if(input$cono_parametros_med == 'Known' & input$cono_parametros_var == 'Unknown'){
+    if(input$cono_parametros_med == 'Known' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == 'mean is not conditional'){
       verticalLayout(
-        numericInput("Alpha","Choose the alpha",
+        numericInput("Alpha","Enter the alpha",
                      value = 0,
                      min = 0),
         numericInput("Beta",
-                     "Choose the beta",
+                     "Enter the beta",
                      value = 0,
                      min=0),
-        sliderInput( 'v', label = h3("Choose the v"), min = 0.1, 
+        sliderInput( 'v', label = h3("Enter the v"), min = 0.1, 
                      max = 2, value = 1),
         numericInput("sigma_n",
                      "Choose the sample sigma",
                      value = 0,
                      min=0)
       )
-    }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Known'){
+    }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Known' & input$conditioned_means == 'mean is not conditional'){
       verticalLayout(
-        numericInput("T0","Choose the T0",
+        numericInput("T0","Enter the T0",
                      value = 0,
                      min = 0),
-        numericInput("yn","Choose the yn",
-                     value = 0,
-                     min = 0),
+        numericInput("yn","Enter the yn",
+                     value = 0),
         sliderInput( 'k', label = h3("Number of standar deviations"), min = -3, 
                      max = 3, value = 1)
       )
       
+    }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == "mean is conditional"){
+      verticalLayout(
+        numericInput("y_bar", "Enter the sample mean",
+          value = 0
+        ),
+        numericInput("sigma_y", "Enter the sample variance",
+                    value = 0,
+                    min = 0
+        ),
+        h4("Prior distribution for theta given sigma_2"),
+      
+        numericInput("M0", "Enter the prior mean",
+                     value = 0
+          
+        ),
+        numericInput("Kappa", "Enter the prior belief about theta",
+                     value = 0,
+                     min = 0
+        ),
+        h4("Prior distribution for sigma_2"),
+        numericInput("alpha", "Enter the alpha",
+                     value = 0,
+                     min = 0
+        ),
+        numericInput("beta_", "Enter the beta",
+                     value = 0,
+                     min = 0
+        )
+      )
     }
   })
+  
+  
+  
   
   observeEvent(input$buttonGraph, {
     output$GraphTitle <- renderUI({
@@ -62,14 +91,17 @@ shinyServer(function(input, output) {
     })
     
     output$distPlot<- renderPlotly({
-      if(input$cono_parametros_med == 'Known' & input$cono_parametros_var == 'Unknown'){
+      if(input$cono_parametros_med == 'Known' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == 'mean is not conditional'){
         g1 = fy_ivgamma(a = input$Alpha, b = input$Beta,theta = input$mean, v= input$v ,n= input$numberObservations, sigma_n = input$sigma_n)
         ggplotly(g1)
-      }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Known'){
+      }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Known'& input$conditioned_means == 'mean is not conditional'){
         g2 = fx_norm_n(t0 = input$T0 ,d = input$k , variance = input$variance, yn = input$yn ,n = input$numberObservations)
         ggplotly(g2)
+      }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == "mean is conditional"){
+        g3 = f_norm_uni(y_barn = input$y_bar, sigma_y = input$sigma_y, mu0 = input$M0, 
+                        k0 = input$k0, alpha_0 = input$alpha, beta_0 = input$beta_, n = input$numberObservations)
+        ggplotly(g3)
       }
-      
       
     })
   })
