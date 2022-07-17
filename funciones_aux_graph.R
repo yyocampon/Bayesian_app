@@ -3,7 +3,7 @@ library(invgamma)
 library(plotly)
 
 
-# Función to plot conjugate model with mean unkown -----------------------
+# Funci?n to plot conjugate model with mean unkown -----------------------
 
 fx_norm_n = function(t0,d,variance,yn,n){
   
@@ -100,7 +100,8 @@ f_norm_uni = function(y_barn, sigma_y, mu0, k0, alpha_0, beta_0, n){
   xmin = min(c((y_barn - 4*sigma_y),(alpha_0-(4*beta_0))))
   xmax = max(c((y_barn + 4*sigma_y),(alpha_0+(4*beta_0))))
   xxnorm = seq(xmin,xmax,length.out = 100000)
-  xxig = xxnorm[xxnorm > 0]
+  # xxig = xxnorm[xxnorm > 0]
+  xxig = seq(0.000000001,xmax,length.out = 100000)
   # A priori for sigma^2:
   fy1 =  dinvgamma(x = xxig, shape =  alpha_0,scale = 1/beta_0)
   # A priori for theta given sigma^2:
@@ -135,5 +136,5 @@ f_norm_uni = function(y_barn, sigma_y, mu0, k0, alpha_0, beta_0, n){
 
 g2 <- f_norm_uni(98.25, 0.5376,98.6, 100, 0.001,0.001,130)
 g2 <- f_norm_uni(5.5, 2,6, 50, 0.001,0.001,5)
-g2 <- f_norm_uni(26.21,115.35,25,5,0.1,0.2,66)
-ggplotly(g2)
+g2df1 <- f_norm_uni(26.21,115.35,25,5,0.1,0.2,66)
+ggplotly(g2df1)
