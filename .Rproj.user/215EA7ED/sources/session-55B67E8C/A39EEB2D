@@ -3,7 +3,7 @@
     "path": "C:/Users/Usuario/OneDrive/Escritorio/Bayesian_app/funciones_aux_graph.R",
     "project_path": "funciones_aux_graph.R",
     "type": "r_source",
-    "hash": "3477570656",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1658175782199.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "103,2",
-        "scrollLine": "95"
+        "cursorPosition": "73,0",
+        "scrollLine": "56"
     },
     "folds": "",
-    "lastKnownWriteTime": 1658177088,
+    "lastKnownWriteTime": 1657942269,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1658177088425,
+    "last_content_update": 1657942269,
     "read_only": false,
     "read_only_alternatives": []
 }
