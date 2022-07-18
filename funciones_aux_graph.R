@@ -3,18 +3,18 @@ library(invgamma)
 library(plotly)
 
 
-# Funcion to plot conjugate model with mean unkown -----------------------
+# Función to plot conjugate model with mean unkown -----------------------
 
 fx_norm_n = function(t0,d,variance,yn,n){
   
   sigma = sqrt(variance)
   mu0 = mean(yn)+(d*sigma)
-  xmin = min(c((yn - 4*sigma),(mu0-4*t0),(mu0-4*sigma)))
-  xmax = max(c((yn + 4*sigma),(mu0+4*t0),(mu0+4*sigma)))
+  ymin = min(c((yn - 4*sigma),(mu0-4*t0),(mu0-4*sigma)))
+  ymax = max(c((yn + 4*sigma),(mu0+4*t0),(mu0+4*sigma)))
   tn_2 = t0^2+(sigma^2)/(n)
   mn = (((yn*n)/sigma^2)+(mu0/(t0^2)))/((n/(sigma^2))+(1/(t0^2)))
   
-  xx = seq(xmin, xmax,length.out = 100000)
+  xx = seq(ymin, ymax,length.out = 100000)
 
   fy1 = dnorm(x = xx,mean = mu0,sd = sigma)
   fy2 = dnorm(x = xx,mean = mn,sd = sqrt(tn_2))
@@ -30,12 +30,9 @@ fx_norm_n = function(t0,d,variance,yn,n){
     geom_line(data=df2, aes(x=xx,y=fy2, colour="Posterior"),size = 1.5)+ # posterior
     geom_line(data=df3, aes(x=xx,y=fy3, colour="Likelihood"),size = 1.3)+ # verosimilitud
     theme_bw()+
-    ggtitle("unknown mean and known variance.")+
-    scale_linetype_manual(values=line_types)+
-    scale_y_continuous("Density", breaks = seq(0,1, 0.1))+
-    scale_x_continuous("Values",  breaks = seq(xmin,xmax)) +
-    scale_color_discrete("Distribution.")
-    #labs(color = "Distribution.", y= "Density", x="Values"  ) 
+    labs(color = "Distribution.", y= "Density", x="Values"  ) + 
+    ggtitle("Unknown mean and known variance.")+
+    scale_linetype_manual(values=line_types)
   p1
 }
 
@@ -67,11 +64,9 @@ fy_ivgamma <- function(a,b,theta,v,n,sigma_n){
     geom_line(data=df2, aes(x=xxig,y=fy2, colour="Posterior"),size = 1.5)+ # posterior
     geom_line(data=df3, aes(x=xx,y=fy3, colour="Likelihood"),size = 1.3)+ # verosimilitud
     theme_bw()+
-    ggtitle("known mean and unknown variance.")+
-    scale_linetype_manual(values=line_types) +
-    scale_y_continuous("Density", breaks = seq(0,1, 0.1))+
-    scale_x_continuous("Values",  breaks = seq(xmin,xmax)) +
-    #labs(color = "Distribution.", y= "Density", x="Values"  ) 
+    labs(color = "Distribution.", y= "Density", x="Values"  ) + 
+    ggtitle("Known mean and unknown variance.")+
+    scale_linetype_manual(values=line_types)
   p1
 }
 
@@ -105,8 +100,8 @@ f_norm_uni = function(y_barn, sigma_y, mu0, k0, alpha_0, beta_0, n){
   xmin = min(c((y_barn - 4*sigma_y),(alpha_0-(4*beta_0))))
   xmax = max(c((y_barn + 4*sigma_y),(alpha_0+(4*beta_0))))
   xxnorm = seq(xmin,xmax,length.out = 100000)
-  #xxig = seq(0.000000001,xmax,length.out = 100000)
-  xxig = xxnorm[xxnorm > 0]
+  xxig = seq(0.000000001,xmax,length.out = 100000)
+  #xxig = xxnorm[xxnorm > 0]
   # A priori for sigma^2:
   fy1 =  dinvgamma(x = xxig, shape =  alpha_0,scale = 1/beta_0)
   # A priori for theta given sigma^2:
@@ -133,12 +128,10 @@ f_norm_uni = function(y_barn, sigma_y, mu0, k0, alpha_0, beta_0, n){
     geom_line(data=df3, aes(x=xxnorm,y=fy3, colour="Likelihood"),size = 1.3)+ # verosimilitud
     geom_line(data=df4, aes(x=xxig,y=fy4, colour="Marginal posterior - sigma^2"),size = 1.3)+
     geom_line(data=df5, aes(x=xxnorm,y=fy5, colour="Marginal posterior - theta"),size = 1.3)+
-    ggtitle("mean and variance unknown with prior distribution of the mean depends of variance.")+
+    labs(color = "Distribution.", y= "Density", x="Values"  ) + 
+    ggtitle("Mean and variance unknown: prior distribution of the mean depends of variance.")+
     scale_linetype_manual(values=line_types)+
-    theme_bw()+
-    scale_y_continuous("Density", breaks = seq(0,1, 0.1))+
-    scale_x_continuous("Values",  breaks = seq(xmin,xmax)) 
-    #labs(color = "Distribution.", y= "Density", x="Values") + 
+    theme_bw()
   p1
 }
 
