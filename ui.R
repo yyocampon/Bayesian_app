@@ -6,7 +6,7 @@ shinyUI(fluidPage(
     titlePanel("Conjugate priors"),
 
     fluidRow(
-        column(6,
+        column(4,
                flowLayout(
                  verticalLayout(
                     h3("Number of observations"),
@@ -47,9 +47,6 @@ shinyUI(fluidPage(
                         uiOutput("data_parameters_norm")
 
                        )
-                       
-                       
-    
                    )
                ),
                
@@ -60,7 +57,7 @@ shinyUI(fluidPage(
               )
         ),
 
-        column(6,
+        column(8,
                actionButton("buttonGraph", "Show graphic"),
                uiOutput("GraphTitle"),
                plotlyOutput('distPlot')

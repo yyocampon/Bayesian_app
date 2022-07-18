@@ -3,7 +3,7 @@ library(invgamma)
 library(plotly)
 
 
-# Funci?n to plot conjugate model with mean unkown -----------------------
+# Función to plot conjugate model with mean unkown -----------------------
 
 fx_norm_n = function(t0,d,variance,yn,n){
   
@@ -30,7 +30,7 @@ fx_norm_n = function(t0,d,variance,yn,n){
     geom_line(data=df2, aes(x=xx,y=fy2, colour="Posterior"),size = 1.5)+ # posterior
     geom_line(data=df3, aes(x=xx,y=fy3, colour="Likelihood"),size = 1.3)+ # verosimilitud
     theme_bw()+
-    labs(color = "Distribution.") + 
+    labs(color = "Distribution.", y= "Density", x="Values"  ) + 
     ggtitle("Unknown mean and known variance.")+
     scale_linetype_manual(values=line_types)
   p1
@@ -64,7 +64,7 @@ fy_ivgamma <- function(a,b,theta,v,n,sigma_n){
     geom_line(data=df2, aes(x=xxig,y=fy2, colour="Posterior"),size = 1.5)+ # posterior
     geom_line(data=df3, aes(x=xx,y=fy3, colour="Likelihood"),size = 1.3)+ # verosimilitud
     theme_bw()+
-    labs(color = "Distribution.") + 
+    labs(color = "Distribution.", y= "Density", x="Values"  ) + 
     ggtitle("Known mean and unknown variance.")+
     scale_linetype_manual(values=line_types)
   p1
@@ -100,8 +100,8 @@ f_norm_uni = function(y_barn, sigma_y, mu0, k0, alpha_0, beta_0, n){
   xmin = min(c((y_barn - 4*sigma_y),(alpha_0-(4*beta_0))))
   xmax = max(c((y_barn + 4*sigma_y),(alpha_0+(4*beta_0))))
   xxnorm = seq(xmin,xmax,length.out = 100000)
-  # xxig = xxnorm[xxnorm > 0]
   xxig = seq(0.000000001,xmax,length.out = 100000)
+  #xxig = xxnorm[xxnorm > 0]
   # A priori for sigma^2:
   fy1 =  dinvgamma(x = xxig, shape =  alpha_0,scale = 1/beta_0)
   # A priori for theta given sigma^2:
@@ -120,6 +120,7 @@ f_norm_uni = function(y_barn, sigma_y, mu0, k0, alpha_0, beta_0, n){
   df4 = data.frame(xxig,fy4)
   df5 = data.frame(xxnorm,fy5)
   
+  #line_types = c("A priori - sigma^2"=1,"A priori - theta"=2,"Likelihood" = 3, "Marginal posterior - sigma^2"=4,"Marginal posterior - theta"=5)
   line_types = c("A priori - sigma^2"=1,"A priori - theta"=2,"Likelihood" = 3, "Marginal posterior - sigma^2"=4,"Marginal posterior - theta"=5)
   p1 = ggplot(df1, aes(x = xxig,y = fy1, colour="A priori - sigma^2")) + 
     geom_line(size = 1.4)+
@@ -127,14 +128,14 @@ f_norm_uni = function(y_barn, sigma_y, mu0, k0, alpha_0, beta_0, n){
     geom_line(data=df3, aes(x=xxnorm,y=fy3, colour="Likelihood"),size = 1.3)+ # verosimilitud
     geom_line(data=df4, aes(x=xxig,y=fy4, colour="Marginal posterior - sigma^2"),size = 1.3)+
     geom_line(data=df5, aes(x=xxnorm,y=fy5, colour="Marginal posterior - theta"),size = 1.3)+
-    theme_bw()+
-    labs(color = "Distribution.") + 
-    ggtitle("Mean and variance unknown: prior distribution of the mean depends of variance")+
-    scale_linetype_manual(values=line_types)
+    labs(color = "Distribution.", y= "Density", x="Values"  ) + 
+    ggtitle("Mean and variance unknown: prior distribution of the mean depends of variance.")+
+    scale_linetype_manual(values=line_types)+
+    theme_bw()
   p1
 }
 
 g2 <- f_norm_uni(98.25, 0.5376,98.6, 100, 0.001,0.001,130)
 g2 <- f_norm_uni(5.5, 2,6, 50, 0.001,0.001,5)
-g2df1 <- f_norm_uni(26.21,115.35,25,5,0.1,0.2,66)
-ggplotly(g2df1)
+g2 <- f_norm_uni(26.21,115.35,25,5,0.1,0.2,66)
+ggplotly(g2)

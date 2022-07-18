@@ -99,12 +99,16 @@ shinyServer(function(input, output) {
         ggplotly(g2)
       }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == "mean is conditional"){
         g3 = f_norm_uni(y_barn = input$y_bar, sigma_y = input$sigma_y, mu0 = input$M0, 
-                        k0 = input$k0, alpha_0 = input$alpha, beta_0 = input$beta_, n = input$numberObservations)
+                        k0 = input$Kappa, alpha_0 = input$alpha, beta_0 = input$beta_, n = input$numberObservations)
         ggplotly(g3)
       }
       
     })
   })
+  
+  
+  
+
 })
 
 
