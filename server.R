@@ -87,7 +87,7 @@ shinyServer(function(input, output) {
   
   observeEvent(input$buttonGraph, {
     output$GraphTitle <- renderUI({
-      h4("Normal conjugate model.",  align = "center")
+      h4("Normal conjugate model:",  align = "center")
     })
     
     output$distPlot<- renderPlotly({
