@@ -1,26 +1,26 @@
 {
-    "id": "A39EEB2D",
+    "id": "2B1A9D55",
     "path": "C:/Users/Usuario/OneDrive/Escritorio/Bayesian_app/funciones_aux_graph.R",
     "project_path": "funciones_aux_graph.R",
     "type": "r_source",
     "hash": "0",
     "contents": "",
     "dirty": false,
-    "created": 1658175782199.0,
+    "created": 1658399225854.0,
     "source_on_save": false,
-    "relative_order": 4,
+    "relative_order": 3,
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "73,0",
-        "scrollLine": "56"
+        "cursorPosition": "149,0",
+        "scrollLine": "4"
     },
-    "folds": "",
-    "lastKnownWriteTime": 1657942269,
+    "folds": "5|51|37|0|\n38|56|72|0|\n81|22|146|0|\n",
+    "lastKnownWriteTime": 1658445874,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1657942269,
+    "last_content_update": 1658445874886,
     "read_only": false,
     "read_only_alternatives": []
 }

@@ -6,7 +6,16 @@ library(plotly)
 # source where there are auxiliar funtions to plot densities
 source("funciones_aux_graph.R")
 
-shinyServer(function(input, output) {
+server <- function(input, output) {
+  
+  output$menu <- renderUI({
+    sidebarMenu(id="menu_item",
+                menuItem("Likelihood distribution", tabName = "scenario_item"),
+                menuItem("Prior distribution", tabName = "prior_item"),
+                menuItem("Graphic", tabName = "graph_item")
+    )
+  })
+  
   
   output$data_parameters_norm <- renderUI({
     h3("Prior distribution")
@@ -82,33 +91,32 @@ shinyServer(function(input, output) {
     }
   })
   
+ 
   
-  
-  
+  #Botón para mostrar gráfico, diseño inicial.
   observeEvent(input$buttonGraph, {
     output$GraphTitle <- renderUI({
       h4("Normal conjugate model:",  align = "center")
     })
+  output$distPlot<- renderPlotly({
+    if(input$cono_parametros_med == 'Known' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == 'mean is not conditional'){
+      g1 = fy_ivgamma(a = input$Alpha, b = input$Beta,theta = input$mean, v= input$v ,n= input$numberObservations, sigma_n = input$sigma_n)
+      ggplotly(g1)
+    }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Known'& input$conditioned_means == 'mean is not conditional'){
+      g2 = fx_norm_n(t0 = input$T0 ,d = input$k , variance = input$variance, yn = input$yn ,n = input$numberObservations)
+      ggplotly(g2)
+    }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == "mean is conditional"){
+      g3 = f_norm_uni(y_barn = input$y_bar, sigma_y = input$sigma_y, mu0 = input$M0, 
+                      k0 = input$Kappa, alpha_0 = input$alpha, beta_0 = input$beta_, n = input$numberObservations)
+      ggplotly(g3)
+    }
     
-    output$distPlot<- renderPlotly({
-      if(input$cono_parametros_med == 'Known' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == 'mean is not conditional'){
-        g1 = fy_ivgamma(a = input$Alpha, b = input$Beta,theta = input$mean, v= input$v ,n= input$numberObservations, sigma_n = input$sigma_n)
-        ggplotly(g1)
-      }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Known'& input$conditioned_means == 'mean is not conditional'){
-        g2 = fx_norm_n(t0 = input$T0 ,d = input$k , variance = input$variance, yn = input$yn ,n = input$numberObservations)
-        ggplotly(g2)
-      }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == "mean is conditional"){
-        g3 = f_norm_uni(y_barn = input$y_bar, sigma_y = input$sigma_y, mu0 = input$M0, 
-                        k0 = input$Kappa, alpha_0 = input$alpha, beta_0 = input$beta_, n = input$numberObservations)
-        ggplotly(g3)
-      }
-      
-    })
   })
+})
   
   
   
 
-})
+}
 
 
