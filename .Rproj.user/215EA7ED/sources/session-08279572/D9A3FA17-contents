@@ -1,0 +1,125 @@
+########## R?plica c?digo clase 5:##########################################
+
+library(BayesDA)
+data("light")
+
+y_barn = mean(light)
+sigma_y = var(light) # (Varianza)
+mu0 = 25
+k0 =  5
+alpha_0 =  0.1
+beta_0 =  0.2
+n =  66
+nu_0 = 2*alpha_0
+sigma0_2 = (2*beta_0)/nu_0
+
+#PARAMETROS A PRIORI THETA
+sigma_2 = rinvgamma(1,shape =  alpha_0,scale = 1/beta_0) 
+# Creencia a priori para theta
+kappa_0=k0
+
+#PARAMETROS POSTERIOR SIGMA
+kappa_n = kappa_0 + n
+nu_n = nu_0 + n
+nu = sum((light-mu0)^2)/n
+alpha_n = nu_n/2
+beta_n = (n*nu+nu_0*sigma0_2)/2
+sigma_n2 = (nu_0*sigma0_2 + (n-1)*sigma_y + ((n*kappa_0*(y_barn-mu0)^2)/(kappa_n)))/(nu_n)
+gl = n + nu_0
+mu_n = ((mu0*kappa_0)+(n*y_barn))/(kappa_n)
+
+# A priori for sigma^2:
+fy1 =  dinvgamma(x = light[light>0], shape =  alpha_0,scale = 1/beta_0)
+# A priori for theta given sigma^2:
+fy2 = dnorm(x = light, mean = mu0, sd = sqrt(sigma_2/k0))
+# Verosimilitud:
+fy3 = dnorm(x = light, mean = y_barn, sd = sqrt(sigma_y))
+# Posterior marginal for sigma:
+fy4 = dinvgamma(x = light[light>0], shape =  alpha_n,scale = 1/beta_n)
+# Posterior marginal for theta:
+val_theta = rt(1000,gl)*sqrt(sigma_n2/(n+kappa_0))+ mu_n 
+
+df1 = data.frame(light[light>0],fy1)
+df2 = data.frame(light,fy2)
+df3 = data.frame(light,fy3)
+df4 = data.frame(light[light>0],fy4)
+df5 = data.frame(val_theta)
+p = ggplot(data=df5, aes(x=val_theta, colour="Marginal posterior - theta"))+
+  geom_density()+
+  geom_line(data = df1, aes(x = light[light>0],y = fy1, colour="A priori - sigma^2"))+
+  geom_line(data=df2, aes(x=light,y=fy2, colour="A priori - theta"))+ # posterior
+  geom_line(data=df3, aes(x=light,y=fy3, colour="Likelihood"))+ # verosimilitud
+  geom_line(data=df4, aes(x=light[light>0],y=fy4, colour="Marginal posterior - sigma^2"))
+ggplotly(p)
+
+#Gr?fica 1: Theta
+p1 = ggplot(data = df5, aes(x=val_theta, colour="Marginal posterior - theta")) + geom_density()+
+   geom_line(data=df2, aes(x=light,y=fy2, colour="A priori - theta"))+
+   geom_line(data=df3, aes(x=light,y=fy3, colour="Likelihood")) 
+#apriori toma valores negativos
+
+#Gr?fica 2: Sigma
+p2 = ggplot(data=df4, aes(x=light[light>0], colour="Marginal posterior - sigma^2"))+ geom_density() +
+  geom_line(data = df1, aes(x = light[light>0],y = fy1, colour="A priori - sigma^2")) +
+  geom_line(data=df3, aes(x=light,y=fy3, colour="Likelihood"))
+
+p1
+p2
+ggplotly(p2)
+
+
+
+############## Funci?n par?metros seg?n notas.##########################
+f_norm_uni = function(y_barn, sigma_y, mu0, k0, alpha_0, beta_0, n){
+  xmin = min(c((y_barn - 4*sigma_y),(alpha_0-(4*beta_0))))
+  xmax = max(c((y_barn + 4*sigma_y),(alpha_0+(4*beta_0))))
+  xxnorm = seq(xmin,xmax,length.out = 10000)
+  xxig = xxnorm[xxnorm > 0]
+  
+  #PARAMETROS A PRIORI SIGMA
+  nu_0 = 2*alpha_0
+  sigma0_2 = (2*beta_0)/nu_0
+  
+  #PARAMETROS A PRIORI THETA
+  sigma_2 = rinvgamma(1,shape =  alpha_0,scale = 1/beta_0) 
+  # Creencia a priori para theta
+  kappa_0=k0
+  
+  #PARAMETROS POSTERIOR SIGMA
+  kappa_n = kappa_0 + n
+  nu_n = nu_0 + n
+  alpha_n = nu_n/2
+  sigma_n2 = (nu_0*sigma0_2 + (n-1)*sigma_y + ((n*kappa_0*(y_barn-mu0)^2)/(kappa_n)))/(nu_n)
+  beta_n = (nu_n*sigma_n2)/2
+  gl = n + nu_0
+  mu_n = ((mu0*kappa_0)+(n*y_barn))/(kappa_n)
+  
+  # A priori for sigma^2:
+  fy1 =  dinvgamma(x = xxig[xxig>0], shape =  alpha_0,scale = 1/beta_0)
+  # A priori for theta given sigma^2:
+  fy2 = dnorm(x = xxnorm, mean = mu0, sd = sqrt(sigma_2/k0))
+  # Verosimilitud:
+  fy3 = dnorm(x = xxnorm, mean = y_barn, sd = sqrt(sigma_y))
+  # Posterior marginal for sigma:
+  fy4 = dinvgamma(x = xxig[xxig>0], shape =  alpha_n,scale = 1/beta_n)
+  # Posterior marginal for theta:
+  val_theta = rt(1000,gl)*sqrt(sigma_n2/(n+kappa_0))+ mu_n 
+  
+  df1 = data.frame(xxig[xxig>0],fy1)
+  df2 = data.frame(xxnorm,fy2)
+  df3 = data.frame(xxnorm,fy3)
+  df4 = data.frame(xxig[xxig>0],fy4)
+  df5 = data.frame(val_theta)
+  
+  p1 = ggplot(data=df5, aes(x=val_theta, colour="Marginal posterior - theta")) + 
+    geom_density(size = 1.3)+
+    geom_line(data= df1, aes(x = xxig,y = fy1, colour="A priori - sigma^2"),size = 1.3)+
+    geom_line(data=df2, aes(x=xxnorm,y=fy2, colour="A priori - theta"),size = 1.3)+ # posterior
+    geom_line(data=df3, aes(x=xxnorm,y=fy3, colour="Likelihood"),size = 1.3) # verosimilitud
+    geom_line(data=df4, aes(x=xxig,y=fy4, colour="Marginal posterior - sigma^2"),size = 1.3)
+  p1
+}
+g2 <- f_norm_uni(98.25, 0.5376,98.6, 100, 0.1,0.2,130)
+g2 <- f_norm_uni(5.5, 2,6, 50, 0.001,0.001,500)
+g2 <- f_norm_uni(26.21,115.46,25,5,0.1,0.2,66)
+ggplotly(g2)

@@ -84,23 +84,29 @@ ui <- dashboardPage(
     ),
     
     dashboardSidebar(
-        uiOutput("menu")
+        sidebarMenu(
+            menuItem("Home", tabName = "home",icon = icon("home", lib = "glyphicon")),
+            menuItemOutput("item_data"),
+            menuItemOutput("item_prior"),
+            menuItemOutput("item_graphic")
+        )
     ),
     
     dashboardBody(
-        h3("Number of observations"),
-        numericInput("numberObservations",
-                     "Choose the number of observations",
-                     value = 0),
-        h3("Data Likelihood"),
-        selectInput("distribution_type",
+        tabItems(
+            tabItem("home",
+                h3("Data Likelihood"),
+                selectInput("distribution_type",
                     "Likelihood",
                     selected = "",
                     choices = c("","Normal")
-        ),
-        
-        tabItems(
+                )
+            ),
             tabItem("scenario_item",
+                    h3("Number of observations"),
+                    numericInput("numberObservations",
+                                 "Choose the number of observations",
+                                 value = 0),
                     selectInput("cono_parametros_med",
                                 "Mean: choose the scenario",
                                 selected = "",
@@ -118,24 +124,26 @@ ui <- dashboardPage(
                                 choices = c("","mean is conditional","mean is not conditional")
                     ),
                     
-                    uiOutput("data_parameters_norm")
+                    uiOutput("data_parameters_norm"),
+                    actionButton("button_delete", "Clear fields")
             ),
             
             tabItem("prior_item",
-                uiOutput("prior_parameters_norm")
+                uiOutput("prior_parameters_norm"),
+                actionButton("button_delete", "Clear fields")
             ),
             
             tabItem("graph_item",
+                    #actionButton("buttonGraph", "Show graphic"),
+                    uiOutput("GraphTitle"),
                     tabsetPanel(
                         tabPanel("Graphic",
-                            actionButton("buttonGraph", "Show graphic"),
                             plotlyOutput("distPlot")
                         ),
                         tabPanel("Theory")
                     )
         
-                )
-            
+            )
         )
     )    
             
