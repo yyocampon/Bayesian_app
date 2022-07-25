@@ -3,7 +3,7 @@
     "path": "C:/Users/Usuario/OneDrive/Escritorio/Bayesian_app/ui.R",
     "project_path": "ui.R",
     "type": "r_source",
-    "hash": "0",
+    "hash": "2841562280",
     "contents": "",
     "dirty": false,
     "created": 1658399215483.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "90,41",
-        "scrollLine": "81"
+        "cursorPosition": "4,0",
+        "scrollLine": "0"
     },
-    "folds": "4|41|78|0|\n",
-    "lastKnownWriteTime": 1658584298,
+    "folds": "",
+    "lastKnownWriteTime": 1658782303,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1658584298664,
+    "last_content_update": 1658782303245,
     "read_only": false,
     "read_only_alternatives": []
 }

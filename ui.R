@@ -2,147 +2,57 @@ library(shiny)
 library(shinythemes)
 library(shinydashboard)
 
-    ######################DISEÑO INICIAL.#########################################
-# #shinyUI(
-#     fluidPage(
-#     theme = shinytheme("flatly"),
-#     titlePanel("Conjugate priors."),
-# 
-#     fluidRow(
-#         column(4,
-#                flowLayout(
-#                  verticalLayout(
-#                     h3("Number of observations"),
-#                     numericInput("numberObservations",
-#                         "Choose the number of observations",
-#                         value = 0)
-#                  )
-#                ),
-#                
-#                flowLayout(
-#                    verticalLayout(
-#                        h3("Data Likelihood"),
-#                        selectInput("distribution_type",
-#                                    "Likelihood",
-#                                    selected = "",
-#                                    choices = c("","Normal")
-#                        ), 
-#                        
-#                        conditionalPanel(
-#                            condition = "input.distribution_type == 'Normal'",
-#                            selectInput("cono_parametros_med",
-#                                        "Mean: choose the scenario",
-#                                        selected = "",
-#                                        choices = c("","Known","Unknown")
-#                            ),
-#                            selectInput("cono_parametros_var",
-#                                        "Variance: choose the scenario",
-#                                        selected = "",
-#                                        choices = c("","Known","Unknown")
-#                            ),
-#                            
-#                            selectInput("conditioned_means",
-#                                        "Conditional mean:choose the scenario",
-#                                        selected = "",
-#                                        choices = c("","mean is conditional","mean is not conditional")
-#                            ),
-#                            
-#                         uiOutput("data_parameters_norm")
-# 
-#                        )
-#                    )
-#                ),
-#                
-#                flowLayout(
-#                    verticalLayout(
-#                        uiOutput("prior_parameters_norm"),
-#                    )
-#               )
-#         ),
-# 
-#         column(8,
-#                tabsetPanel(
-#                    tabPanel("Graphic",actionButton("buttonGraph", "Show graphic"),
-#                                 uiOutput("GraphTitle"),
-#                                 plotOutput('distPlot')),
-#                    tabPanel("Theory") 
-#                )
-#                
-#         )
-#     )
-#   ) 
-# )
-
-
-
-
-
-########################PROPUESTA DISEÑO.###########################
-ui <- dashboardPage(
+ui <- dashboardPage(skin = "green",
     dashboardHeader(
-        title = "Conjugate priors."
+        title = "Conjugate models.",
+        titleWidth = 200
     ),
-    
-    dashboardSidebar(
+    dashboardSidebar(width = 200,
         sidebarMenu(
-            menuItem("Home", tabName = "home",icon = icon("home", lib = "glyphicon")),
+            menuItem("Home", tabName = "home",icon = icon("home",verify_fa = FALSE)),
             menuItemOutput("item_data"),
             menuItemOutput("item_prior"),
             menuItemOutput("item_graphic")
         )
     ),
-    
     dashboardBody(
         tabItems(
             tabItem("home",
-                h3("Data Likelihood"),
-                selectInput("distribution_type",
-                    "Likelihood",
-                    selected = "",
-                    choices = c("","Normal")
-                )
+                fluidRow(
+                    column(width = 6,
+                        selectInput("distribution_type",
+                        "Likelihood",
+                        selected = "",
+                        choices = c("","Normal","ensayo")
+                        )
+                    )
+                ),
+                fluidRow(
+                    column( width = 6,
+                        uiOutput("mean_input"),
+                        uiOutput("variance_input")
+                    ),
+                    column(width = 6,
+                        uiOutput("conditional_input")
+                    )
+                )   
             ),
-            tabItem("scenario_item",
-                    h3("Number of observations"),
-                    numericInput("numberObservations",
-                                 "Choose the number of observations",
-                                 value = 0),
-                    selectInput("cono_parametros_med",
-                                "Mean: choose the scenario",
-                                selected = "",
-                                choices = c("","Known","Unknown")
-                    ),
-                    selectInput("cono_parametros_var",
-                                "Variance: choose the scenario",
-                                selected = "",
-                                choices = c("","Known","Unknown")
-                    ),
-                    
-                    selectInput("conditioned_means",
-                                "Conditional mean:choose the scenario",
-                                selected = "",
-                                choices = c("","mean is conditional","mean is not conditional")
-                    ),
-                    
-                    uiOutput("data_parameters_norm"),
-                    actionButton("button_delete", "Clear fields")
+            tabItem("likelihood_item",
+                uiOutput("data_parameters")
             ),
             
             tabItem("prior_item",
                 uiOutput("prior_parameters_norm"),
-                actionButton("button_delete", "Clear fields")
             ),
             
-            tabItem("graph_item",
-                    #actionButton("buttonGraph", "Show graphic"),
-                    uiOutput("GraphTitle"),
+            tabItem("show_item",
+                    h4("Normal conjugate model:",  align = "center"),
                     tabsetPanel(
                         tabPanel("Graphic",
                             plotlyOutput("distPlot")
                         ),
                         tabPanel("Theory")
                     )
-        
             )
         )
     )    

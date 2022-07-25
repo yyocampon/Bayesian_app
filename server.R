@@ -7,45 +7,106 @@ library(plotly)
 source("funciones_aux_graph.R")
 
 server <- function(input, output) {
-  output$item_data <- renderUI({
-      if(input$distribution_type == "Normal"){
-        menuItem("Likelihood distribution", tabName = "scenario_item")
-      }
-  })
   
-  output$item_prior <- renderUI({
-    if(input$cono_parametros_med != "" &&
-       input$cono_parametros_var != "" &&
-       input$conditioned_means != ""){
-      menuItem("Prior distribution", tabName = "prior_item")
+#Agrega item "likelihood" e formulario para escoger el escenario."  ####################
+  observeEvent(input$distribution_type, {
+    if(input$distribution_type == "Normal"){
+      output$item_data <- renderUI({
+        menuItem("Likelihood distribution", tabName = "likelihood_item", icon = icon("bar-chart",verify_fa = FALSE))
+      })
+      output$mean_input <- renderUI({
+        selectInput("cono_parametros_med",
+                    "Mean: choose the scenario",
+                    selected = "",
+                    choices = c("","Known","Unknown")
+        )
+      })
+      output$variance_input <- renderUI({
+          selectInput("cono_parametros_var",
+                      "Variance: choose the scenario",
+                      selected = "",
+                      choices = c("","Known","Unknown")
+          )
+      })
+      output$conditional_input <- renderUI({
+        selectInput("conditioned_means",
+              "Conditional mean:choose the scenario",
+              selected = "",
+              choices = c("","mean is conditional","mean is not conditional")
+        )    
+      })
     }
   })
-  output$item_graphic <- renderUI({
+  
+  
+#Agrega el item "prior" y "graphic" ##################################
+  observeEvent(input$conditioned_means,{
     if(input$conditioned_means != ""){
-      menuItem("Graphic", tabName = "graph_item",icon = icon("stats", lib = "glyphicon"))
+      output$item_prior <- renderUI({
+          menuItem("Prior distribution", tabName = "prior_item",icon = icon("users",verify_fa = FALSE))
+      })
+      output$item_graphic <- renderUI({
+          menuItem("Graphic", tabName = "graph_item",
+                   menuSubItem("Show graphic", tabName = "show_item"),
+                   menuSubItem("Clear", tabName = "clear_item"),
+                  icon = icon("line-chart",verify_fa = FALSE)
+          
+          )
+      })
     }
   })
 
-  # observeEvent(input$v, {
-  #     output$item_graphic <- renderUI({
-  #       menuItem("Graphic", tabName = "graph_item")
-  #     })
-  # })
   
-  output$data_parameters_norm <- renderUI({
-    h3("Prior distribution")
-    if(input$cono_parametros_med == 'Known' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == 'mean is not conditional'){
-      numericInput("mean","Choose the mean",
-                   value = 0,
-                   min = 0)
-    }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Known' & input$conditioned_means == 'mean is not conditional'){
-      numericInput("variance","Choose the variance",
-                   value = 0,
-                   min = 0)
+  
+  
+  
+  
+#Agrega el formulario para distribución de verosimilitud ##############################
+  output$data_parameters <- renderUI({
+    if(input$conditioned_means == 'mean is not conditional'){
+      fluidRow(
+        column(width = 6,
+               numericInput("numberObservations",
+                                          "Enter the number of observations",
+                                            value = 0)
+                            
+        ),
+        column(width = 6,
+               if(input$cono_parametros_med == 'Known' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == 'mean is not conditional'){
+                 numericInput("mean","Enter the mean",
+                              value = 0)
+               }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Known' & input$conditioned_means == 'mean is not conditional'){
+                 numericInput("variance","Enter the variance",
+                              value = 0,
+                              min = 0)
+               } 
+        )
+      )
+    }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == "mean is conditional"){
+        fluidRow(
+          column(width = 4,
+                 numericInput("numberObservations",
+                              "Enter the number of observations",
+                              value = 0)
+                 
+          ),
+          column(width = 4,
+                 numericInput("y_barn", "Enter the sample mean",
+                              value = 0)
+                 
+          ),
+          column(width = 4,
+                 numericInput("variance_y", "Enter the sample variance",
+                              value = 0,
+                              min = 0)
+          )
+        )
     }
-  
+    
   })
   
+  
+#Agrega formulario para distribución a prior #############################
   output$prior_parameters_norm <- renderUI({
     if(input$cono_parametros_med == 'Known' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == 'mean is not conditional'){
       verticalLayout(
@@ -59,7 +120,7 @@ server <- function(input, output) {
         sliderInput( 'v', label = h3("Enter the v"), min = 0.1, 
                      max = 2, value = 1),
         numericInput("variance_n",
-                     "Choose the sample variance",
+                     "Enter the sample variance",
                      value = 0,
                      min=0)
       )
@@ -76,20 +137,13 @@ server <- function(input, output) {
       
     }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == "mean is conditional"){
       verticalLayout(
-        numericInput("y_bar", "Enter the sample mean",
-          value = 0
-        ),
-        numericInput("variance_y", "Enter the sample variance",
-                    value = 0,
-                    min = 0
-        ),
         h4("Prior distribution for theta given sigma_2"),
       
         numericInput("M0", "Enter the prior mean",
                      value = 0
           
         ),
-        numericInput("Kappa", "Enter the prior belief about theta",
+        numericInput("c", "Enter the prior belief about theta",
                      value = 0,
                      min = 0
         ),
@@ -105,38 +159,10 @@ server <- function(input, output) {
       )
     }
   })
-  
- 
-  
-  #Botón para mostrar gráfico, diseño inicial##########################
-  observeEvent(input$buttonGraph, {
-    output$GraphTitle <- renderUI({
-      h4("Normal conjugate model:",  align = "center")
-    })
-    output$distPlot<- renderPlotly({
-      if(input$cono_parametros_med == 'Known' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == 'mean is not conditional'){
-        g1 = fy_ivgamma(a = input$Alpha, b = input$Beta,theta = input$mean, v= input$v ,n= input$numberObservations, variance_n = input$variance_n)
-        ggplotly(g1)
-      }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Known'& input$conditioned_means == 'mean is not conditional'){
-        g2 = fx_norm_n(t0 = input$T0 ,d = input$k , variance = input$variance, yn = input$yn ,n = input$numberObservations)
-        ggplotly(g2)
-      }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == "mean is conditional"){
-        g3 = f_norm_uni(y_barn = input$y_bar, variance_y = input$variance_y, mu0 = input$M0, 
-                        k0 = input$Kappa, alpha_0 = input$alpha, beta_0 = input$beta_, n = input$numberObservations)
-        ggplotly(g3)
-      }
-      
-    })
-})
-  
-  
-  
+
 
   
-  output$GraphTitle <- renderUI({
-    h4("Normal conjugate model:",  align = "center")
-  })
-  
+#Gráfico según escenario ####################### 
   output$distPlot<- renderPlotly({
     if(input$cono_parametros_med == 'Known' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == 'mean is not conditional'){
       g1 = fy_ivgamma(a = input$Alpha, b = input$Beta,theta = input$mean, v= input$v ,n= input$numberObservations, variance_n = input$variance_n)
@@ -145,12 +171,14 @@ server <- function(input, output) {
       g2 = fx_norm_n(t0 = input$T0 ,d = input$k , variance = input$variance, yn = input$yn ,n = input$numberObservations)
       ggplotly(g2)
     }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == "mean is conditional"){
-      g3 = f_norm_uni(y_barn = input$y_bar, variance_y = input$variance_y, mu0 = input$M0, 
-                      k0 = input$Kappa, alpha_0 = input$alpha, beta_0 = input$beta_, n = input$numberObservations)
+      g3 = f_norm_uni(y_barn = input$y_barn, sigma_y = input$variance_y, mu0 = input$M0, 
+                      c = input$c, alpha_0 = input$alpha, beta_0 = input$beta_, n = input$numberObservations)
       ggplotly(g3)
     }
     
   })
+
+  
 }
 
 

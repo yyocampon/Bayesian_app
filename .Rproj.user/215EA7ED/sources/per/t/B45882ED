@@ -3,7 +3,7 @@
     "path": "C:/Users/Usuario/OneDrive/Escritorio/Bayesian_app/server.R",
     "project_path": "server.R",
     "type": "r_source",
-    "hash": "0",
+    "hash": "2616329614",
     "contents": "",
     "dirty": false,
     "created": 1658399207767.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "20,5",
-        "scrollLine": "7"
+        "cursorPosition": "173,59",
+        "scrollLine": "165"
     },
-    "folds": "34|43|46|2|\n48|44|106|2|\n110|45|133|0|\n",
-    "lastKnownWriteTime": 1658584345,
+    "folds": "",
+    "lastKnownWriteTime": 1658782983,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1658584345049,
+    "last_content_update": 1658782996015,
     "read_only": false,
     "read_only_alternatives": []
 }
