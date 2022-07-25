@@ -23,7 +23,7 @@ ui <- dashboardPage(skin = "green",
                         selectInput("distribution_type",
                         "Likelihood",
                         selected = "",
-                        choices = c("","Normal","ensayo")
+                        choices = c("","Normal")
                         )
                     )
                 ),
@@ -38,6 +38,13 @@ ui <- dashboardPage(skin = "green",
                 )   
             ),
             tabItem("likelihood_item",
+                fluidRow(
+                  column(width = 6,
+                         numericInput("numberObservations",
+                              "Enter the number of observations",
+                              value = 0)
+                  )
+                ),
                 uiOutput("data_parameters")
             ),
             

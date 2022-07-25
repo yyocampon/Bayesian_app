@@ -1,0 +1,70 @@
+library(shiny)
+library(shinythemes)
+library(shinydashboard)
+
+ui <- dashboardPage(skin = "green",
+    dashboardHeader(
+        title = "Conjugate models.",
+        titleWidth = 200
+    ),
+    dashboardSidebar(width = 200,
+        sidebarMenu(
+            menuItem("Home", tabName = "home",icon = icon("home",verify_fa = FALSE)),
+            menuItemOutput("item_data"),
+            menuItemOutput("item_prior"),
+            menuItemOutput("item_graphic")
+        )
+    ),
+    dashboardBody(
+        tabItems(
+            tabItem("home",
+                fluidRow(
+                    column(width = 6,
+                        selectInput("distribution_type",
+                        "Likelihood",
+                        selected = "",
+                        choices = c("","Normal")
+                        )
+                    )
+                ),
+                fluidRow(
+                    column( width = 6,
+                        uiOutput("mean_input"),
+                        uiOutput("variance_input")
+                    ),
+                    column(width = 6,
+                        uiOutput("conditional_input")
+                    )
+                )   
+            ),
+            tabItem("likelihood_item",
+                fluidRow(
+                  column(width = 6,
+                         numericInput("numberObservations",
+                              "Enter the number of observations",
+                              value = 0)
+                  )
+                ),
+                uiOutput("data_parameters")
+            ),
+            
+            tabItem("prior_item",
+                uiOutput("prior_parameters_norm"),
+            ),
+            
+            tabItem("show_item",
+                    h4("Normal conjugate model:",  align = "center"),
+                    tabsetPanel(
+                        tabPanel("Graphic",
+                            plotlyOutput("distPlot")
+                        ),
+                        tabPanel("Theory")
+                    )
+            )
+        )
+    )    
+            
+    
+)
+
+ 
