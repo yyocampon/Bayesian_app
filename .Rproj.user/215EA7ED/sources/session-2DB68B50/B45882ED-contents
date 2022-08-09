@@ -2,6 +2,7 @@ library(shiny)
 library(invgamma)
 library(ggplot2)
 library(plotly)
+library(fontawesome)
 
 # source where there are auxiliar funtions to plot densities
 source("funciones_aux_graph.R")
@@ -56,54 +57,50 @@ server <- function(input, output) {
     }
   })
 
-  
-  
-  
-  
-  
 #Agrega el formulario para distribución de verosimilitud ##############################
   output$data_parameters <- renderUI({
-    if(input$conditioned_means == 'mean is not conditional'){
+    if(input$cono_parametros_med == 'Known' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == 'mean is not conditional'){
       fluidRow(
         column(width = 6,
-               numericInput("numberObservations",
-                                          "Enter the number of observations",
-                                            value = 0)
-                            
+               numericInput("mean","Enter the mean",
+                            value = 0)
         ),
         column(width = 6,
-               if(input$cono_parametros_med == 'Known' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == 'mean is not conditional'){
-                 numericInput("mean","Enter the mean",
-                              value = 0)
-               }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Known' & input$conditioned_means == 'mean is not conditional'){
-                 numericInput("variance","Enter the variance",
-                              value = 0,
-                              min = 0)
-               } 
+               numericInput("variance_n",
+                            "Enter the sample variance",
+                            value = 0,
+                            min=0)
+          
+        )
+      )
+    }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Known' & input$conditioned_means == 'mean is not conditional'){
+      fluidRow(
+        column(width = 6,
+               numericInput("yn","Enter the sample mean (y_n)",
+                            value = 0)
+        ),
+        column(width = 6,
+               numericInput("variance","Enter the variance",
+                            value = 0, 
+                            min = 0)
         )
       )
     }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == "mean is conditional"){
-        fluidRow(
-          column(width = 4,
-                 numericInput("numberObservations",
-                              "Enter the number of observations",
-                              value = 0)
-                 
-          ),
-          column(width = 4,
-                 numericInput("y_barn", "Enter the sample mean",
-                              value = 0)
-                 
-          ),
-          column(width = 4,
-                 numericInput("variance_y", "Enter the sample variance",
-                              value = 0,
-                              min = 0)
-          )
+      fluidRow(
+        column(width = 6,
+            numericInput("y_barn", "Enter the sample mean",
+                  value = 0)     
+        ),
+        column(width = 6,
+               numericInput("variance_y", "Enter the sample variance",
+                            value = 0,
+                            min = 0)
         )
+      )
     }
-    
+      
   })
+  
   
   
 #Agrega formulario para distribución a prior #############################
@@ -118,19 +115,13 @@ server <- function(input, output) {
                      value = 0,
                      min=0),
         sliderInput( 'v', label = h3("Enter the v"), min = 0.1, 
-                     max = 2, value = 1),
-        numericInput("variance_n",
-                     "Enter the sample variance",
-                     value = 0,
-                     min=0)
+                     max = 2, value = 1)
       )
     }else if(input$cono_parametros_med == 'Unknown' & input$cono_parametros_var == 'Known' & input$conditioned_means == 'mean is not conditional'){
       verticalLayout(
         numericInput("T0","Enter the T0",
                      value = 0,
                      min = 0),
-        numericInput("yn","Enter the yn",
-                     value = 0),
         sliderInput( 'k', label = h3("Number of standar deviations"), min = -3, 
                      max = 3, value = 1)
       )

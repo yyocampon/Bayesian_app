@@ -80,84 +80,100 @@ fy_ivgamma <- function(a,b,theta,v,n,variance_n){
 ## Scenary 3:
 # Mean and variance unknown: prior distribution of the mean depends of variance
 
-############################------- FUNCIÓN NUEVA ---------------------############
+############################------- FUNCI?N CON SIMULACI?N---------------------############
 f_norm_uni = function(y_barn, sigma_y, mu0, c, alpha_0, beta_0, n){
   nu_0 = 2*alpha_0
   sigma0_2 = (2*beta_0)/nu_0
-  
-  
+
+
   #PARAMETROS A PRIORI THETA
-  sigma_2 = rinvgamma(1,shape =  alpha_0,scale = 1/beta_0) # ¿sería la forma de generar el valor de sigma^2 para ingresarlo como parámetro de la apriori de theta?
+  sigma_2 = rinvgamma(1,shape =  alpha_0,scale = 1/beta_0) 
   while (sigma_2 == Inf) {
     sigma_2 = rinvgamma(1,shape =  alpha_0,scale = 1/beta_0)
   }
-  
+
   # Creencia a priori para theta
   kappa_0 = 1/c
   #kappa_0=k0
   
-  xmin = min(c((y_barn - 4*sigma_y),(mu0 - (4*sigma_2/kappa_0)),(alpha_0-(4*beta_0))))
-  xmax = max(c((y_barn + 4*sigma_y),(mu0 - (4*sigma_2/kappa_0)),(alpha_0+(4*beta_0))))
-  
-  #PARAMETROS POSTERIOR SIGMA
+  # xmin = min(c((y_barn - 4*sigma_y),(mu0 - (4*sigma_2/kappa_0)),(alpha_0-(4*beta_0))))
+  # xmax = max(c((y_barn + 4*sigma_y),(mu0 - (4*sigma_2/kappa_0)),(alpha_0+(4*beta_0))))
+
+#PAR?METROS POSTERIOR SIGMA
   kappa_n = kappa_0 + n
   nu_n = nu_0 + n
   #nu = sum((light-mu0)^2)/n
+  #val_vero = rnorm(1000,mean = y_barn, sd = sqrt(sigma_y))
   val_vero = rnorm(1000,mean = y_barn, sd = sqrt(sigma_y))
-  nu = sum((val_vero-mu0)^2)/n
+  val_vero_m = sample(val_vero, n)
+  nu = sum((val_vero_m-mu0)^2)/n
   alpha_n = nu_n/2
   beta_n = (n*nu+nu_0*sigma0_2)/2
-  
+
   sigma_n2 = (nu_0*sigma0_2 + (n-1)*sigma_y + ((n*kappa_0*(y_barn-mu0)^2)/(kappa_n)))/(nu_n)
-  
+
   gl = n + nu_0
   mu_n = ((mu0*kappa_0)+(n*y_barn))/(kappa_n)
+  x = seq(0.01,0.95,length.out = 1000)
   
-  # A priori for sigma^2:
-  #fy1 =  dinvgamma(x = light[light>0], shape =  alpha_0,scale = 1/beta_0)
-  val_apriori_s2 = rinvgamma(1000, shape =  alpha_0,scale = 1/beta_0) ## A veces genera inf
-  densfy1 = density(val_apriori_s2)
-  fy1 = densfy1$y
-  # A priori for theta given sigma^2:
-  #fy2 = dnorm(x = light, mean = mu0, sd = sqrt(sigma_2/k0))
+
+# A PRIORI FOR sigma^2:
+  # #fy1 =  dinvgamma(x = light[light>0], shape =  alpha_0,scale = 1/beta_0)
+  # val_apriori_s2 = rinvgamma(1000, shape =  alpha_0,scale = 1/beta_0) ## A veces genera inf
+  # densfy1 = density(val_apriori_s2)
+  # fy1 = densfy1$y
+  cuant_apr_sigma = qinvgamma(p = x,shape = alpha_0,scale = 1/beta_0)
+  den_apri_sigma = dinvgamma(cuant_apr_sigma,shape =alpha_0,scale = 1/beta_0)
+  P = ecdf(cuant_apr_sigma)
+  df1 = data.frame(cuant_apr_sigma,den_apri_sigma)
+  df1_red = df1[df1$cuant_apr_sigma<cuant_apr_sigma[min(which(P(cuant_apr_sigma) > 0.95))],]
+
+  
+# A PRIORI FOR THETA GIVEN sigma^2:
   val_apriori_theta = rnorm(1000, mean = mu0, sd = sqrt(sigma_2*kappa_0))
   densfy2 = density(val_apriori_theta)
   fy2 = densfy2$y
-  # Verosimilitud:
-  #fy3 = dnorm(x = light, mean = y_barn, sd = sqrt(sigma_y))
+  df2 = data.frame(val_apriori_theta)
+  
+# VEROSIMILITUD:
   densfy3 = density(val_vero)
   fy3 = densfy3$y
-  # Posterior marginal for sigma:
-  val_sigma = rinvgamma(1000,shape =  alpha_n,scale = 1/beta_n)
-  dens_val_sigma <- density(val_sigma)
-  fy4 = dens_val_sigma$y
-  #fy4 = dinvgamma(x = light[light>0], shape =  alpha_n,scale = 1/beta_n)
-  # Posterior marginal for theta:
-  val_theta = rt(1000,gl)*sqrt(sigma_n2/(n+kappa_0))+ mu_n 
+  df3 = data.frame(val_vero)
+  
+# POSTERIOR MARGINAL FOR SIGMA:
+  # val_sigma = rinvgamma(1000,shape =  alpha_n,scale = 1/beta_n)
+  # dens_val_sigma <- density(val_sigma)
+  # fy4 = dens_val_sigma$y
+  # fy4 = dinvgamma(x = light[light>0], shape =  alpha_n,scale = 1/beta_n)
+  
+  cuant_post_sigma = qinvgamma(p=x, shape=alpha_n, scale = 1/beta_n)
+  den_post_sigma = dinvgamma(cuant_post_sigma, shape = alpha_n, scale = 1/beta_n)
+  P = ecdf(cuant_post_sigma)
+  df4 = data.frame(cuant_post_sigma,den_post_sigma)
+  df4_red = df4[df4$cuant_post_sigma<cuant_post_sigma[min(which(P(cuant_post_sigma) > 0.95))],]
+  
+# POSTERIOR MARGINAL FOR THETA:
+  val_theta = rt(1000,gl)*sqrt(sigma_n2/(n+kappa_0))+ mu_n
   dens_val_tehta <- density(val_theta)
   fy5 = dens_val_tehta$y
-  
-  df1 = data.frame(val_apriori_s2)
-  df2 = data.frame(val_apriori_theta)
-  df3 = data.frame(val_vero)
-  df4 = data.frame(val_sigma)
   df5 = data.frame(val_theta)
-  
-  line_types = c("A priori - theta"=1,"Likelihood" = 2, "Marginal posterior - theta"=3,"A priori - sigma^2"=4,"Marginal posterior - sigma^2"=5) # 
-  p1 = ggplot() + 
-    geom_density(df2, mapping = aes(x = val_apriori_theta,colour="A priori - theta"),size = 1.4) +
-    geom_density(data=df3, aes(x=val_vero, colour="Likelihood"),size = 1.5)+
-    geom_density(data=df5, aes(x=val_theta, colour="Marginal posterior - theta"),size = 1.5)+
-    geom_density(data=df1, aes(x=val_apriori_s2, colour="A priori - sigma^2"),size = 1.3)+
-    geom_density(data=df4, aes(x=val_sigma, colour="Marginal posterior - sigma^2"),size = 1.5)+
-    labs(color = "Distribution.", y= "Density", x="Values"  ) + 
-    ggtitle("Mean and variance unknown: prior distribution of the mean depends of variance.")+
-    scale_linetype_manual(values=line_types)+
-    theme_bw()#+scale_x_continuous(limits = c(xmin, xmax))
-  p1
-}
 
-# g2 <- f_norm_uni(98.25, 0.5376,98.6, 100, 0.001,0.001,130)
-# g2 <- f_norm_uni(5.5, 2,6, 50, 0.001,0.001,5)
-# g2 <- f_norm_uni(26.21,115.35,25,5,0.1,0.2,66)
-#ggplotly(g2)
+  line_types = c("A priori - theta"=1,"Likelihood" = 2, "Marginal posterior - theta"=3,"A priori - sigma^2"=4,"Marginal posterior - sigma^2"=5) #
+  p1 = ggplot() +
+    geom_density(data=df3, aes(val_vero,colour="Likelihood"),size = 1.4)+
+    geom_density(data=df2, aes (val_apriori_theta,colour="A priori - theta" ),size = 1.4)+
+    geom_density(data=df5, aes(val_theta,colour = "Marginal posterior - theta" ), size= 1.4)
+    
+  p2 = ggplot(data = df1_red, aes(cuant_apr_sigma,den_apri_sigma, colour="A priori"))+
+    geom_line(size = 1.4) +
+    geom_line(data = df4_red, aes(cuant_post_sigma,den_post_sigma, colour="Posterior"), size= 1.4)+
+    labs(color = "Distribution.", y= "Density", x="Values")+
+    ggtitle("Mean and variance unknown: prior distribution of the mean depends of variance.", subtitle = "Sigma")+
+    theme_bw()
+
+  p2
+}
+g2 <- f_norm_uni(98.25, 0.5376,98.6, 100, 0.001,0.001,130)
+g2 <- f_norm_uni(5.5, 2,6, 50, 0.001,0.001,5)
+g2 <- f_norm_uni(26.21,115.35,25,5,1,1,66)
+ggplotly(g2)
