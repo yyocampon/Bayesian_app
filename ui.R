@@ -7,7 +7,9 @@ ui <- dashboardPage(skin = "green",
         title = "Conjugate models.",
         titleWidth = 200
     ),
+    
     dashboardSidebar(width = 200,
+        #Menu             
         sidebarMenu(
             menuItem("Home", tabName = "home",icon = icon("home",verify_fa = FALSE)),
             menuItemOutput("item_data"),
@@ -15,7 +17,9 @@ ui <- dashboardPage(skin = "green",
             menuItemOutput("item_graphic")
         )
     ),
+    
     dashboardBody(
+        #Content of each menu item
         tabItems(
             tabItem("home",
                 fluidRow(
@@ -53,18 +57,16 @@ ui <- dashboardPage(skin = "green",
             ),
             
             tabItem("show_item",
-                    h4("Normal conjugate model:",  align = "center"),
-                    tabsetPanel(
-                        tabPanel("Graphic",
-                            plotlyOutput("distPlot")
-                        ),
-                        tabPanel("Theory")
-                    )
+                h4("Normal conjugate model:",  align = "center"),
+                tabsetPanel(
+                    tabPanel("Graphic",
+                    plotlyOutput("distPlot")
+                    ),
+                    tabPanel("Theory")
+                )
             )
         )
     )    
-            
-    
 )
 
  

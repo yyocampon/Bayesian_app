@@ -1,0 +1,26 @@
+{
+    "id": "B45882ED",
+    "path": "C:/Users/Usuario/OneDrive/Escritorio/Bayesian_app/server.R",
+    "project_path": "server.R",
+    "type": "r_source",
+    "hash": "1970262754",
+    "contents": "",
+    "dirty": false,
+    "created": 1658399207767.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "156,32",
+        "scrollLine": "1"
+    },
+    "folds": "11|55|41|2|\n42|37|58|0|\n59|48|104|2|\n105|35|154|2|\n",
+    "lastKnownWriteTime": 1660767301,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1660767390830,
+    "read_only": false,
+    "read_only_alternatives": []
+}

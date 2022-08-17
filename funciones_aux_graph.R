@@ -5,6 +5,7 @@ library(plotly)
 
 # Function to plot conjugate model with mean unkown ----
 fx_norm_n = function(t0,d,variance,yn,n){
+
 #Input parameters -----  
   #t0:A prior standard deviation
   #d: It indicates how many standard deviations we want the a priori mean of the sample mean.
@@ -34,20 +35,16 @@ fx_norm_n = function(t0,d,variance,yn,n){
   df2 = data.frame(xx,fy2) #Database for posterior distribution
   df3 = data.frame(xx,fy3) #Database for likelihood distribution
   
-  
 #Graph of distributions -----
-  line_types = c("A priori"=1, "Posterior"=3, "Likelihood"=2) #Vector with types of distributions.
-  
   p_1 = ggplot(data=df1, aes(x=xx, y=fy1, colour="A priori")) + 
-    geom_line(size=0.8)
+    geom_line(size=0.8)+
     geom_line(size=0.8) +
     geom_line(data=df2, aes(x=xx, y=fy2, colour="Posterior"), size=0.8) +
     geom_line(data=df3, aes(x=xx, y=fy3, colour="Likelihood"), size=0.8) +
     theme_bw() +
     labs(color="Distribution", y= "Density", x="Values") +
-    ggtitle("Unknown mean and known variance.") +
-    scale_linetype_manual(values=line_types)
-    
+    ggtitle("Unknown mean and known variance.") 
+
   p_1 #Graphic
 }
 
@@ -74,15 +71,14 @@ fy_ivgamma <- function(a,b,theta,v,n,variance_n){
   df2 = data.frame(xxig,fy2)
   df3 = data.frame(xx,fy3)
   
-  line_types = c("A priori"=1,"Posterior"=3,"Likelihood" = 2)
   p1 = ggplot(df1, aes(x = xxig,y = fy1, colour="A priori")) + 
     geom_line(size = 0.8)+ # apriori
     geom_line(data=df2, aes(x=xxig,y=fy2, colour="Posterior"),size = 0.8)+ # posterior
     geom_line(data=df3, aes(x=xx,y=fy3, colour="Likelihood"),size = 0.8)+ # verosimilitud
     theme_bw()+
     labs(color = "Distribution.", y= "Density", x="Values"  ) + 
-    ggtitle("Known mean and unknown variance.")+
-    scale_linetype_manual(values=line_types)
+    ggtitle("Known mean and unknown variance.")
+
   p1
 }
 
@@ -100,15 +96,7 @@ f_norm_uni = function(y_barn, sigma_y, mu0, c, alpha_0, beta_0, n){
   # c: 1/kappa_0
   # alpha_0: shape parameter for a priori distribution
   # beta_0: scale parameter for a priori distribution
-  
-  y_barn = 5.5
-  sigma_y = 2
-  mu0 = 6
-  c = 50
-  alpha_0 = 1
-  beta_0 = 2
-  n = 5
-  
+
 #Calculated parameters -------
   nu_0 = 2*alpha_0 
   sigma0_2 = (2*beta_0)/nu_0

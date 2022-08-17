@@ -1,0 +1,388 @@
+---
+title: "Prueba_Sigma"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+date: "2022-08-12"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(invgamma)
+library(kableExtra)
+library(ggplot2)
+library(gridExtra)
+library(pscl)
+library(BayesDA)
+```
+
+Se toma como ejemplo el desarrollado por la profesora Isabel en sus notas de clase del curso, en dicho ejemplo se dan los siguientes valores:
+
+
+```{r}
+data(light)
+y_barn=mean(light) # Media muestral
+s=sd(light) # Desviación estándar muestral
+n=length(light) # Tamaño muestral
+sigma_y = var(light) # Varianza muestral
+mu0 = 25 # Media de la apriori de theta|sigma^2
+c = 5 # Creencia apriori sobre theta.
+alpha_0=1 # Parámetro alpha de la a priori de sigma^2
+beta_0=1 # Parámetro beta de la apriori de sigma^2
+```
+
+# Código ejemplo clase 5:
+
+Tomando el código usado por la profesora Isabel en el que trabajó con valores simulados se obtienen los siguientes gráficos, en los paneles superiores se grafican la apriori y la posterior en la misma gráfica, en el superior izquierdo se pone como gráfico principal la posterior, por lo que por defecto el gráfico toma en el eje x los valores que toma la posterior, mientras que en el panel superior derecho se da el protagonismo a la apriori. En este panel superior se observa que el eje x toma los valores de la distribución que se grafica como principal. En el panel inferior se grafican por separado las dos densidades.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+# #PARAMETROS A PRIORI SIGMA^2:
+nu0=2*alpha_0
+sigma0=2*beta_0/nu0
+
+
+#PARAMETROS POSTERIOR SIGMA^2:
+k0=5
+nun=nu0+n
+nu=sum((light-mu0)^2)/n
+a2=(n+nu0)/2
+b2=(n*nu+nu0*sigma0)/2
+
+
+uno=n*k0*(y_barn-mu0)^2/(n+k0)
+sigman=(nu0*sigma0+(n-1)*s^2+uno)/(n+nu0)
+mun=(mu0*k0+n*y_barn)/(n+k0)
+
+#Gráficas para la varianza
+# A priori:
+#apriori <- rinvgamma(1000,shape = alpha_0,scale = 1/beta_0) #Opción 1
+ap <- rigamma(1000,alpha_0,beta_0) # Opción 2
+# Posterioir:
+varianzab<-rigamma(1000,(nun/2),(nun*sigman/2))
+
+# Diferentes gráficos:
+
+par(mfrow=c(2,2),mar=c(2,2,2,2))
+plot(density(varianzab),main="Siendo principal posterior",xlab = expression(sigma^2),ylab="Densidad")
+lines(density(ap), col = 2)
+
+plot(density(ap),main="Siendo principal a priori",xlab = expression(sigma^2),ylab="Densidad")
+lines(density(varianzab), col = 2)
+
+plot(density(ap),type = "l", main="Distribución a priori",xlab = expression(sigma^2),ylab="Densidad")
+
+pos_prof = plot(density(varianzab),type = "l", main="Distribución posterior ejemplo 5",xlab = expression(sigma^2),ylab="Densidad")
+```
+
+# Gráfico con ggplot vs plot ambas distribuciones:
+En estos casos se generan los valores a través de cuantiles, tomando hasta el cuantil 95 y 99
+
+## ggplot
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+#O.95
+x = seq(0.01,0.95,length.out = 1001)
+  nu_0 = 2*alpha_0
+  sigma0_2 = (2*beta_0)/nu_0
+  
+# Creencia a priori para theta
+  kappa_0 = 5
+  
+# Valores verosimilitud
+  x1 = seq(0,0.95,length.out = 66)
+  cuant_vero = qnorm(p = x1, mean = y_barn, sd=sqrt(sigma_y))
+  nu = sum((cuant_vero-mu0)^2)/n
+  #nu=sum((light-mu0)^2)/n
+
+# Parámetros posterior sigma 
+  kappa_n = kappa_0 + n
+  nu_n = nu_0 + n
+  alpha_n = nu_n/2
+  sigma_n2 = (nu_0*sigma0_2 + (n-1)*sigma_y + ((n*kappa_0*(y_barn-mu0)^2)/(kappa_n)))/(nu_n)
+  beta_n = (n*nu+nu_0*sigma0_2)/2
+
+# A priori for sigma^2:
+  cuant_apr_sigma = qinvgamma(p = x,shape = alpha_0,scale = 1/beta_0)
+  den_apri_sigma = dinvgamma(cuant_apr_sigma,shape =alpha_0,scale = 1/beta_0)
+  P = ecdf(cuant_apr_sigma)
+  df1 = data.frame(cuant_apr_sigma,den_apri_sigma)
+  df1_red = df1[df1$cuant_apr_sigma<cuant_apr_sigma[min(which(P(cuant_apr_sigma) > 0.95))],]
+  
+# Posterior marginal for sigma:
+  cuant_post_sigma = qinvgamma(p=x, shape= alpha_n, scale = 1/beta_n)
+  den_post_sigma = dinvgamma(cuant_post_sigma, shape = alpha_n, scale = 1/beta_n)
+  P = ecdf(cuant_post_sigma)
+  df2 = data.frame(cuant_post_sigma,den_post_sigma)
+  df2_red = df2[df2$cuant_post_sigma<cuant_post_sigma[min(which(P(cuant_post_sigma) > 0.95))],]
+
+#Gráfico con ggplot
+line_types = c("apriori", "posterior")
+p95 = ggplot(data = df1_red, mapping = aes(x = cuant_apr_sigma, y = den_apri_sigma, colour="A priori"))+
+  geom_line(size = 0.8)+
+  geom_line(data = df2_red, mapping =aes(x = cuant_post_sigma, y = den_post_sigma, colour="Posterior"),size = 0.8)+
+  theme_bw()+
+  scale_linetype_manual(values=line_types)+
+  labs(x='Values', y='Density', title = "Con cuantil 95")
+
+g95 =  ggplot()+
+geom_line(data = df2_red, mapping =aes(x = cuant_post_sigma, y = den_post_sigma),size = 0.8)+
+ggtitle("Posterior con cuantil 95 \n (secuencia)")+
+labs(x='Values', y='Density')
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+# Con cuantil hasta el 99
+x = seq(0.01,0.99,length.out = 1001)
+  nu_0 = 2*alpha_0
+  sigma0_2 = (2*beta_0)/nu_0
+  
+# Creencia a priori para theta
+  kappa_0 = 5
+  
+# Valores verosimilitud
+  x1 = seq(0,0.99,length.out = 66)
+  cuant_vero = qnorm(p = x1, mean = y_barn, sd=sqrt(sigma_y))
+  nu = sum((cuant_vero-mu0)^2)/n
+  #nu=sum((light-mu0)^2)/n
+
+# Parámetros posterior sigma 
+  kappa_n = kappa_0 + n
+  nu_n = nu_0 + n
+  alpha_n = nu_n/2
+  sigma_n2 = (nu_0*sigma0_2 + (n-1)*sigma_y + ((n*kappa_0*(y_barn-mu0)^2)/(kappa_n)))/(nu_n)
+  beta_n = (n*nu+nu_0*sigma0_2)/2
+
+# A priori for sigma^2:
+  cuant_apr_sigma = qinvgamma(p = x,shape = alpha_0,scale = 1/beta_0)
+  den_apri_sigma = dinvgamma(cuant_apr_sigma,shape =alpha_0,scale = 1/beta_0)
+  P = ecdf(cuant_apr_sigma)
+  df3 = data.frame(cuant_apr_sigma,den_apri_sigma)
+  df3_red = df3[df3$cuant_apr_sigma<cuant_apr_sigma[min(which(P(cuant_apr_sigma) > 0.99))],]
+  
+# Posterior marginal for sigma:
+  cuant_post_sigma = qinvgamma(p=x, shape= alpha_n, scale = 1/beta_n)
+  den_post_sigma = dinvgamma(cuant_post_sigma, shape = alpha_n, scale = 1/beta_n)
+  P = ecdf(cuant_post_sigma)
+  df4 = data.frame(cuant_post_sigma,den_post_sigma)
+  df4_red = df4[df4$cuant_post_sigma<cuant_post_sigma[min(which(P(cuant_post_sigma) > 0.99))],]
+
+#Gráfico con ggplot
+line_types = c("apriori", "posterior")
+p99 = ggplot(data = df3_red, mapping = aes(x = cuant_apr_sigma, y = den_apri_sigma, colour="A priori"))+
+  geom_line(size = 0.8)+
+  geom_line(data = df4_red, mapping =aes(x = cuant_post_sigma, y = den_post_sigma, colour="Posterior"),size = 0.8)+
+  theme_bw()+
+  scale_linetype_manual(values=line_types)+
+  labs(x='Values', y='Density', title = "Con cuantil 99")
+
+g99 =  ggplot()+
+geom_line(data = df4_red, mapping =aes(x = cuant_post_sigma, y = den_post_sigma),size = 0.8)+
+ggtitle("Posterior con cuantil 99 \n(secuencia)")+
+labs(x='Values', y='Density')
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+grid.arrange(p95,p99,g95,g99, ncol = 2, nrow= 2)
+```
+
+## plot
+
+Nos referimos a principal con graficar primero una de las densidades y sobreponer en el mismo gráfico la otra densidad. La línea rojo corresponde a la distribución que será sobrepuesta dado el caso.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+#,fig.align='center', fig.cap = "Gráfico con cuantiles hasta el 95 y 99"
+par(mfrow=c(2,3),mar=c(2,2,2,2))
+
+#0.95
+  plot(df1_red$cuant_apr_sigma, df1_red$den_apri_sigma, type = "l", main="Con 0.95, a priori principal",xlab = expression(sigma^2),ylab="Densidad")
+  lines(df2_red$den_post_sigma,col=2)
+
+  plot(df2_red$cuant_post_sigma,df2_red$den_post_sigma, type = "l", main="Con 0.95, posterior principal",xlab = expression(sigma^2),ylab="Densidad")
+lines(df1_red$den_apri_sigma,col=2)  
+  
+plot(df2_red$cuant_post_sigma,df2_red$den_post_sigma, type = "l",main="Distribución posterior",xlab = expression(sigma^2),ylab="Densidad" )
+
+#0.99
+ plot(df3_red$cuant_apr_sigma, df3_red$den_apri_sigma, type = "l", main="Con 0.99, a priori principal",xlab = expression(sigma^2),ylab="Densidad")
+  lines(df4_red$den_post_sigma,col=2)
+
+plot(df4_red$cuant_post_sigma, df4_red$den_post_sigma, type = "l", main="Con 0.99, posterior principal",xlab = expression(sigma^2),ylab="Densidad")
+lines(df3_red$den_apri_sigma,col=2)  
+  
+pos_se = plot(df4_red$cuant_post_sigma,df4_red$den_post_sigma, type = "l",main="Distribución posterior",xlab = expression(sigma^2),ylab="Densidad")
+```
+
+Se puede concluir:
+
+- El truncamiento de las densidades parece solucionarse cuando se toman cuantiles al 0.99, ya que en el pdf anterior estabamos trabajando al 0.95
+
+- Si se decide graficar las dos distribuciones juntas (posterior y a prior), se ve más conveniente hacerlo bajo el plano de la posterior, y después añadir la a priori por medio de lines(). Aunque la diferencia de escalas hace que no se vea un gráfico tan bonito, puede seguir siendo mejor opción ggplot
+
+- Si se desea graficar las distribuciones en plot y en un mismi plano, lo más conveniente sería que sea bajo el plano de la apriori, ya que poniendolas bajo la posterior no se logra ver el comportamiento de la distribución apriori por sus densidades tan altas.
+
+- En este caso sigue siendo mejor opción graficar por ggplot
+
+# Gráfico con ggplot vs plot individuales:
+
+Teniendo en cuenta lo anterior de ahora en adelante se utiliza cuantiles hasta el 99
+
+## Diferente escala
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+#,fig.align='center', fig.cap = "Gráfico con cuantiles hasta el 99 con diferente escala"
+
+par(mfrow=c(1,2))
+
+plot(df3_red$cuant_apr_sigma,df3_red$den_apri_sigma, type = "l", main="Distribución a priori",xlab = expression(sigma^2),ylab="Densidad")
+
+plot(df4_red$cuant_post_sigma,df4_red$den_post_sigma, type = "l",main="Distribución posterior",xlab = expression(sigma^2),ylab="Densidad")
+
+g_pos_d =  ggplot()+
+geom_line(data = df4_red, mapping =aes(x = cuant_post_sigma, y = den_post_sigma),size = 0.8)+
+ggtitle("Distribución Posterior")+
+labs(x='Values', y='Density')
+
+g_ap =  ggplot()+
+geom_line(data = df3_red, mapping =aes(x = cuant_apr_sigma, y = den_apri_sigma),size = 0.8)+
+ggtitle("Distribución A prior")+
+labs(x='Values', y='Density')
+
+grid.arrange(g_ap,g_pos_d, ncol = 2, nrow= 1)
+```
+
+## Igual escala
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+#,fig.align='center', fig.cap = "Gráfico con cuantiles hasta el 99 con igual escala"
+
+par(mfrow=c(1,2))
+
+plot(df3_red$cuant_apr_sigma,df3_red$den_apri_sigma, type = "l", main="Distribución a priori",xlab = expression(sigma^2),ylab="Densidad")
+
+plot(df4_red$cuant_post_sigma,df4_red$den_post_sigma, type = "l",ylim = c(0,0.5),main="Distribución posterior",xlab = expression(sigma^2),ylab="Densidad")
+
+g_pos =  ggplot()+
+geom_line(data = df4_red, mapping =aes(x = cuant_post_sigma, y = den_post_sigma),size = 0.8)+
+ggtitle("Distribución Posterior")+
+labs(x='Values', y='Density') + ylim(0, 0.5)
+
+g_ap =  ggplot()+
+geom_line(data = df3_red, mapping =aes(x = cuant_apr_sigma, y = den_apri_sigma),size = 0.8)+
+ggtitle("Distribución A prior")+
+labs(x='Values', y='Density')
+
+grid.arrange(g_ap,g_pos, ncol = 2, nrow= 1)
+```
+
+- Consideramos que graficar las distribuciones con diferente o igual escalas son viables porque describe bien el comportamiento de ambas distribuciones, pero aún así es mejor considerar la opción de graficar cada densidad con su propia escala para visualizar mejor la posterior
+
+- La librería para graficar no está influyendo, vemos que con plot y ggplot el gráfico es igual cuando se grafican de forma individual.
+
+# Gráficos con diferentes métodos para generar los datos:
+Para evaluar la diferencia entre los datos simulados (uso de la función rinvgamma) y los generados a través de una secuencia para el parámetro sigma se presenta la siguiente comparación grafica que incluye la realizada por la profesora (Distribución posterior ejemplo 5)
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+#DATOS SIMULADOS.
+
+# A priori for sigma^2:
+ val_apriori_s2 = rinvgamma(1000, shape =  alpha_0,scale = 1/beta_0)
+ densfy1 = density(val_apriori_s2)
+ fy1 = densfy1$y
+ 
+ # Posterior marginal for sigma:
+val_sigma = rinvgamma(1000,shape =  alpha_n,scale = 1/beta_n)
+dens_val_sigma <- density(val_sigma)
+fy4 = dens_val_sigma$y
+
+df1 = data.frame(val_apriori_s2)
+df4 = data.frame(val_sigma)
+
+apri_s <- ggplot(df1, aes(x = val_apriori_s2)) + geom_density(color = 4, size = 0.8)
+post_s <- ggplot(df4, aes(x = val_sigma)) + geom_density(color = 4,size = 0.8) + labs(title = "Posterior con datos simulados")
+
+plot(density(varianzab),type = "l", main="Distribución posterior ejemplo 5",xlab = expression(sigma^2),ylab="Densidad")
+
+grid.arrange(g95,g99,post_s, ncol = 2, nrow =2)
+```
+
+- Se observa que a través de lo que denominamos simulación nos podemos acercar más a la "realidad", mostrando una distribución posterior menos monótona, teniendo en cuenta que es una apliacación academica y lo que se espera es tener diferentes comportamientos.
+
+
+
+```{r}
+f_sim = function(y_barn, sigma_y, mu0, c, alpha_0, beta_0, n){
+
+#Calculated parameters -------
+  nu_0 = 2*alpha_0 
+  sigma0_2 = (2*beta_0)/nu_0
+
+  #Likelihood distribution ----
+  val_vero = rnorm(100000,mean = y_barn, sd = sqrt(sigma_y)) #Sample
+  densfy1 = dnorm(val_vero, mean = y_barn, sd = sqrt(sigma_y))
+  fy1 = densfy1$y #Sample densities
+  df1 = data.frame(val_vero) #Database for the likelihood distribution of theta
+  
+  #Parameters for a priori of theta ----
+  sigma_2 = rinvgamma(1, shape = alpha_0, scale = 1/beta_0) 
+  while (sigma_2 == Inf) { #TODAVÍA ES NECESARIO?
+    sigma_2 = rinvgamma(1,shape =  alpha_0,scale = 1/beta_0)
+  }
+  kappa_0 = 1/c #It's the a priori belief that we have about the parameter sigma_2
+  val_apriori_theta = rnorm(100000, mean=mu0, sd=sqrt(sigma_2*kappa_0)) #Sample
+  densfy2 = dnorm(val_apriori_theta, mean=mu0, sd=sqrt(sigma_2*kappa_0) )
+  fy2 = densfy2$y #Sample densities
+  df2 = data.frame(val_apriori_theta) #Database for the prior distribution of theta
+  
+  x = seq(0.01,0.99,length.out = 100000) #Sequence of quantiles from 0.01 to 0.99
+  
+  #Parameters for a priori of sigma ----
+  cuant_apr_sigma = qinvgamma(p = x, shape = alpha_0, scale = 1/beta_0) #Values of the a prior distribution
+  den_apri_sigma = dinvgamma(cuant_apr_sigma, shape = alpha_0, scale = 1/beta_0) #Sample densities
+  P = ecdf(cuant_apr_sigma)
+  df4 = data.frame(cuant_apr_sigma,den_apri_sigma)
+  df4_red = df4[df4$cuant_apr_sigma<cuant_apr_sigma[min(which(P(cuant_apr_sigma) > 0.99))],] #Database for the a prior distribution of sigma
+  
+  #Parameters for posterior of sigma ----
+  kappa_n = kappa_0 + n #It's the a priori belief that we have about the parameter sigma_n2
+  nu_n = nu_0 + n
+  val_vero_m = sample(val_vero, n) #Subsample of the data to calculate parameter nu. It has n values.
+  nu = sum((val_vero_m-mu0)^2)/n
+  alpha_n = nu_n/2  #Shape parameter for posterior distribution
+  beta_n = (n*nu+nu_0*sigma0_2)/2 #Scale parameter for posterior distribution
+  sigma_n2 = (nu_0*sigma0_2 + (n-1)*sigma_y + ((n*kappa_0*(y_barn-mu0)^2)/(kappa_n)))/(nu_n) #Posterior variance
+  cuant_post_sigma = qinvgamma(p= x, shape= alpha_n, scale = 1/beta_n) #Values of the posterior distribution
+  den_post_sigma = dinvgamma(cuant_post_sigma, shape = alpha_n, scale = 1/beta_n) #Distribution densities
+  P = ecdf(cuant_post_sigma)
+  df5 = data.frame(cuant_post_sigma, den_post_sigma)
+  df5_red = df5[df5$cuant_post_sigma<cuant_post_sigma[min(which(P(cuant_post_sigma) > 0.99))],] ##Database for the posterior distribution of sigma
+
+  #Parameters for posterior of theta ------
+  gl = n + nu_0 #Degrees of freedom
+  mu_n = ((mu0*kappa_0)+(n*y_barn))/(kappa_n) #Mean of the posterior distribution
+  val_theta = rt(1000,gl)*sqrt(sigma_n2/(n+kappa_0))+ mu_n #Sample
+  dens_val_tehta = dt(val_theta, gl)
+  fy3 = dens_val_tehta$y #Sample densities
+  df3 = data.frame(val_theta) #Database for the posterior distribution of theta
+  
+#Graph for each parameter -----
+  
+  # Graph for theta ----
+  p_31 = ggplot(data=df1, aes( x= , y = densfy1,colour="Likelihood")) +
+    geom_line(size = 0.8)+
+    geom_line(data = df2)
+   
+  
+  # Graph for sigma ----
+  p_32 = ggplot(data = df4_red, aes(cuant_apr_sigma,den_apri_sigma, colour="A priori"))+
+    geom_line(size = 0.8) +
+    geom_line(data = df5_red, aes(cuant_post_sigma,den_post_sigma, colour="Posterior"), size= 0.8) +
+    labs(color = "Distribution.", y= "Density", x="Values")+
+    ggtitle("Mean and variance unknown: prior distribution of the mean depends of variance.", subtitle = "Sigma") +
+    theme_bw()
+
+  p_32
+  #grid.arrange(p_31, p_32, ncol = 2)
+}
+```
+

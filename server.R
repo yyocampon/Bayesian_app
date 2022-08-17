@@ -4,12 +4,12 @@ library(ggplot2)
 library(plotly)
 library(fontawesome)
 
-# source where there are auxiliar funtions to plot densities
+#Source where there are auxiliar funtions to plot densities
 source("funciones_aux_graph.R")
 
 server <- function(input, output) {
   
-#Agrega item "likelihood" e formulario para escoger el escenario."  ####################
+#Add "likelihood" item and form to choose the scenario.####################
   observeEvent(input$distribution_type, {
     if(input$distribution_type == "Normal"){
       output$item_data <- renderUI({
@@ -40,7 +40,7 @@ server <- function(input, output) {
   })
   
   
-#Agrega el item "prior" y "graphic" ##################################
+#Add the item "prior" and "graphic". ##################################
   observeEvent(input$conditioned_means,{
     if(input$conditioned_means != ""){
       output$item_prior <- renderUI({
@@ -57,7 +57,7 @@ server <- function(input, output) {
     }
   })
 
-#Agrega el formulario para distribución de verosimilitud ##############################
+#Adds the form for the likelihood distribution. ##############################
   output$data_parameters <- renderUI({
     if(input$cono_parametros_med == 'Known' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == 'mean is not conditional'){
       fluidRow(
@@ -103,7 +103,7 @@ server <- function(input, output) {
   
   
   
-#Agrega formulario para distribución a prior #############################
+#Add form for "prior" distribution #############################
   output$prior_parameters_norm <- renderUI({
     if(input$cono_parametros_med == 'Known' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == 'mean is not conditional'){
       verticalLayout(
@@ -153,7 +153,7 @@ server <- function(input, output) {
 
 
   
-#Gráfico según escenario ####################### 
+#Graph by scenario ####################### 
   output$distPlot<- renderPlotly({
     if(input$cono_parametros_med == 'Known' & input$cono_parametros_var == 'Unknown' & input$conditioned_means == 'mean is not conditional'){
       g1 = fy_ivgamma(a = input$Alpha, b = input$Beta,theta = input$mean, v= input$v ,n= input$numberObservations, variance_n = input$variance_n)
