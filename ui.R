@@ -62,7 +62,7 @@ ui <- dashboardPage(skin = "green",
                     tabPanel("Graphic",
                     plotlyOutput("distPlot")
                     ),
-                    tabPanel("Theory")
+                    tabPanel("Theory", htmlOutput("teoria"))
                 )
             )
         )

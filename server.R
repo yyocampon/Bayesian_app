@@ -150,6 +150,11 @@ server <- function(input, output) {
       )
     }
   })
+  
+  getPage<-function() {
+    return(includeHTML("Explanation_models.html"))
+  }
+  output$teoria<-renderUI({getPage()})
 
 
   

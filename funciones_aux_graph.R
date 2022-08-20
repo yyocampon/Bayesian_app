@@ -47,8 +47,8 @@ fx_norm_n = function(t0,d,variance,yn,n){
   p_1 #Gráfico
 }
 
-fx_norm_n(t0=40 ,d = 3,variance = 1600 ,yn = 150,n = 100)
-fx_norm_n(t0=15 ,d = 2,variance = 1600 ,yn = 150,n = 50)
+# fx_norm_n(t0=40 ,d = 3,variance = 1600 ,yn = 150,n = 100)
+# fx_norm_n(t0=15 ,d = 2,variance = 1600 ,yn = 150,n = 50)
 
 
 # Función para graficar el modelo conjugado con varianza desconocida ----
@@ -101,10 +101,10 @@ fy_ivgamma <- function(a,b,theta,v,n,variance_n){
 
 }
 
-fy_ivgamma(a = 1100, b = 250000,theta = 220, v= 395.83,n=12, variance_n = 396.78)
-fy_ivgamma(a = 30, b = 30,theta = 12, v= 0.5,n=100, variance_n = 25)
-fy_ivgamma(a = 1, b = 1,theta = 180, v= 193.83,n=30, variance_n = 400)
-fy_ivgamma(a = 1, b = 0.1,theta =5, v= 4,n=5, variance_n = 4)
+# fy_ivgamma(a = 1100, b = 250000,theta = 220, v= 395.83,n=12, variance_n = 396.78)
+# fy_ivgamma(a = 30, b = 30,theta = 12, v= 0.5,n=100, variance_n = 25)
+# fy_ivgamma(a = 1, b = 1,theta = 180, v= 193.83,n=30, variance_n = 400)
+# fy_ivgamma(a = 1, b = 0.1,theta =5, v= 4,n=5, variance_n = 4)
 #-------------------------------------------------------------
 
 # Multiparametric models.
@@ -197,9 +197,9 @@ f_norm_uni = function(y_barn, sigma_y, mu0, kappa_0, alpha_0, beta_0, n){
     ggtitle("Posterior distribution", subtitle = "Sigma") +
     theme_bw()
   
-  grid.arrange(p_31, p_32, p_33, ncol = 2, nrow = 2 )
+  grid.arrange(p_31, p_32, p_33, ncol = 2, nrow = 2)
 
 }
-g2 <- f_norm_uni(5.5, 2,6, 50, 1,2,5)
-g2 <- f_norm_uni(26.21,115.35,25,5,1,1,66)
-ggplotly(g2)
+# g2 <- f_norm_uni(5.5, 2,6, 50, 1,2,5)
+# g2 <- f_norm_uni(26.21,115.35,25,5,1,1,66)
+# ggplotly(g2)
