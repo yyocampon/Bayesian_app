@@ -5,17 +5,18 @@ library(invgamma)
 library(ggplot2)
 library(plotly)
 library(fontawesome)
+library(gridExtra)
+
 
 ui <- dashboardPage(skin = "green",
     dashboardHeader(
-        title = "Conjugate models.",
-        titleWidth = 200
+        title = "Modelos conjugados.",
+        titleWidth = 400
     ),
     
-    dashboardSidebar(width = 200,
-        #Menu             
+    dashboardSidebar(width = 400,
         sidebarMenu(
-            menuItem("Home", tabName = "home",icon = icon("home",verify_fa = FALSE)),
+            menuItem("Inicio", tabName = "home",icon = icon("home",verify_fa = FALSE)),
             menuItemOutput("item_data"),
             menuItemOutput("item_prior"),
             menuItemOutput("item_graphic")
@@ -23,13 +24,12 @@ ui <- dashboardPage(skin = "green",
     ),
     
     dashboardBody(
-        #Content of each menu item
         tabItems(
             tabItem("home",
                 fluidRow(
                     column(width = 6,
                         selectInput("distribution_type",
-                        "Likelihood",
+                        "Verosimilitud",
                         selected = "",
                         choices = c("","Normal")
                         )
@@ -49,7 +49,7 @@ ui <- dashboardPage(skin = "green",
                 fluidRow(
                   column(width = 6,
                          numericInput("numberObservations",
-                              "Enter the number of observations",
+                              "Ingrese la cantidad de observaciones",
                               value = 0)
                   )
                 ),
@@ -61,12 +61,12 @@ ui <- dashboardPage(skin = "green",
             ),
             
             tabItem("show_item",
-                h4("Normal conjugate model:",  align = "center"),
+                h4("Modelo normal conjugado:",  align = "center"),
                 tabsetPanel(
-                    tabPanel("Graphic",
+                    tabPanel("Gráfico",
                     plotlyOutput("distPlot")
                     ),
-                    tabPanel("Theory", htmlOutput("teoria"))
+                    tabPanel("Teoría", htmlOutput("teoria"))
                 )
             )
         )

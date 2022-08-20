@@ -39,10 +39,10 @@ fx_norm_n = function(t0,d,variance,yn,n){
     geom_line(size=0.8)+
     geom_line(size=0.8) +
     geom_line(data=df2, aes(x=xx, y=fy2, colour="Posterior"), size=0.8) +
-    geom_line(data=df3, aes(x=xx, y=fy3, colour="Likelihood"), size=0.8) +
+    geom_line(data=df3, aes(x=xx, y=fy3, colour="Verosimilitud"), size=0.8) +
     theme_bw() +
-    labs(color="Distribution", y= "Density", x="Values") +
-    ggtitle("Unknown mean and known variance.") 
+    labs(color="Distribución", y= "Densidad", x="Valores") +
+    ggtitle("Media desconocida y varianza conocida.") 
 
   p_1 #Gráfico
 }
@@ -52,10 +52,10 @@ fx_norm_n = function(t0,d,variance,yn,n){
 
 
 # Función para graficar el modelo conjugado con varianza desconocida ----
-fy_ivgamma <- function(a,b,theta,v,n,variance_n){
+fy_ivgamma <- function(a,b,theta,v,n,s_2){
   
   # Parámetros calculados  -------
-  sigma_n = sqrt(variance_n) # Desviación estándar muestral
+  sigma_n = sqrt(s_2) # Desviación estándar muestral
   v0 = 2*a # usado para calcular los parámetros alpha y beta de la distribuiones a priori y posterior de sigma^2
   sigma0_2 = (2*b)/v0 # usado para calcular los parámetros alpha y beta de la distribuiones a priori y posterior de sigma^2
   v= v # usado para calcular los parámetros alpha y beta de la distribuiones a priori y posterior de sigma^2
@@ -81,43 +81,43 @@ fy_ivgamma <- function(a,b,theta,v,n,variance_n){
   
   p_21 = ggplot(data=df4_red, aes(x=cuant_apr_sigma, y=den_apri_sigma)) + 
     geom_line(size = 0.8, col = 3) +
-    labs(color = "Distribution.", y= "Density", x="Values")+
-    ggtitle("Unknown variance - A priori") +
+    labs(color = "Dsitribución", y= "Densidad", x="Valores")+
+    ggtitle("varianza desconocida - A priori") +
     theme_bw()
   
   p_22 = ggplot() + 
     geom_line(data = df2, aes(x=dens_pos.x, y=dens_pos.y), size=0.8, col = 4)+
-    labs(color = "Distribution.", y= "Density", x="Values")+
-    ggtitle("Unknown variance - Posterior") +
+    labs(color = "Distribución.", y= "Densidad", x="Valores")+
+    ggtitle("Varianza desconocida - Posterior") +
     theme_bw()
   
   p_23 = ggplot()+
     geom_line(data = df3, aes(x=dens_vero.x, y=dens_vero.y), size=0.8, col = 2)+
-    labs(color = "Distribution.", y= "Density", x="Values")+
-    ggtitle("Unknown variance - Likelihood") +
+    labs(color = "Dsitribución", y= "Densidad", x="Valores")+
+    ggtitle("Varianza desconocida - Verosimilitud") +
     theme_bw()
-  
-  grid.arrange(p_21, p_22, p_23, ncol = 2, nrow = 2 )
+  p_23
+ # grid.arrange(p_21, p_22, p_23, ncol = 2, nrow = 2 )
 
 }
 
-# fy_ivgamma(a = 1100, b = 250000,theta = 220, v= 395.83,n=12, variance_n = 396.78)
-# fy_ivgamma(a = 30, b = 30,theta = 12, v= 0.5,n=100, variance_n = 25)
-# fy_ivgamma(a = 1, b = 1,theta = 180, v= 193.83,n=30, variance_n = 400)
-# fy_ivgamma(a = 1, b = 0.1,theta =5, v= 4,n=5, variance_n = 4)
+# fy_ivgamma(a = 1100, b = 250000,theta = 220, v= 395.83,n=12, s_2 = 396.78)
+# fy_ivgamma(a = 30, b = 30,theta = 12, v= 0.5,n=100, s_2 = 25)
+# fy_ivgamma(a = 1, b = 1,theta = 180, v= 193.83,n=30, s_2 = 400)
+# fy_ivgamma(a = 1, b = 0.1,theta =5, v= 4,n=5, s_2 = 4)
 #-------------------------------------------------------------
 
-# Multiparametric models.
+# Modelos paramétricos.
 
 
 # Función para graficar el modelo conjugado con media y varianza desconocida: distribución a priori de la media depende de la varianza ----
 
-f_norm_uni = function(y_barn, sigma_y, mu0, kappa_0, alpha_0, beta_0, n){
+f_norm_uni = function(y_barn, S_y, mu0, kappa_0, alpha_0, beta_0, n){
 #Parámetros de entrada -----   
   # n: Tamaño de la muestra
   # mu0: Representa la media de la distribución a prior condicionada en la varianza.
   # y_barn: Media muestral
-  # sigma_y: Varianza muestral 
+  # S_y: Varianza muestral 
   # kappa_0: Creencia a priori que se tiene sobre la varianza (sigma_2)
   # alpha_0: Parámetro de forma para la distribución a priori
   # beta_0: Parámetro de escala para la distribución posterior
@@ -127,7 +127,7 @@ f_norm_uni = function(y_barn, sigma_y, mu0, kappa_0, alpha_0, beta_0, n){
   sigma0_2 = (2*beta_0)/nu_0
 
   #Distribución de verosimilitud ----
-  val_vero = rnorm(100000,mean = y_barn, sd = sqrt(sigma_y)) #Muestra para verosimilitud
+  val_vero = rnorm(100000,mean = y_barn, sd = sqrt(S_y)) #Muestra para verosimilitud
   densfy1 = density(val_vero)
   fy1 = densfy1$y #Densidades de los valores muestrales
   df1 = data.frame(densfy1$x, densfy1$y) #Base de datos para verosimilitud: valores en X y densidades
@@ -159,7 +159,7 @@ f_norm_uni = function(y_barn, sigma_y, mu0, kappa_0, alpha_0, beta_0, n){
   nu = sum((val_vero_m-mu0)^2)/n
   alpha_n = nu_n/2  #Parámetro de forma para la distribución posterior
   beta_n = (n*nu+nu_0*sigma0_2)/2 #Parámetro de escala para distribución psoterior
-  sigma_n2 = (nu_0*sigma0_2 + (n-1)*sigma_y + ((n*kappa_0*(y_barn-mu0)^2)/(kappa_n)))/(nu_n) #Varianza psoterior
+  sigma_n2 = (nu_0*sigma0_2 + (n-1)*S_y + ((n*kappa_0*(y_barn-mu0)^2)/(kappa_n)))/(nu_n) #Varianza psoterior
   cuant_post_sigma = rinvgamma(100000, shape= alpha_n, scale = 1/beta_n) #Valores de la distribución posterior
   den_post_sigma = density(cuant_post_sigma) #Densidades de la distribución
   df5 = data.frame(den_post_sigma$x, den_post_sigma$y) #Base de datos para distribución posterior de sigma
@@ -169,7 +169,7 @@ f_norm_uni = function(y_barn, sigma_y, mu0, kappa_0, alpha_0, beta_0, n){
   gl = n + nu_0 # Grados de libertad
   mu_n = ((mu0*kappa_0)+(n*y_barn))/(kappa_n) #Media de la distribución psoterior
   val_theta = rt(1000,gl) *sqrt(sigma_n2/(n+kappa_0))+ mu_n #Muestra para distribución posterior de theta
-  densidades = density(val_theta) # Densidades meustrales
+  densidades = density(val_theta) # Densidades muestrales
   df3 = data.frame(densidades$x, densidades$y) # Base de datos para distribución posterior de theta
   
 #Gráfico para cada parámetro -----
@@ -179,25 +179,25 @@ f_norm_uni = function(y_barn, sigma_y, mu0, kappa_0, alpha_0, beta_0, n){
     geom_line(size = 0.8) +
     geom_line(data = df2, aes(x=densfy2.x, y=densfy2.y,colour="A priori"), size=0.8)+
     geom_line(data = df3, aes(x=densidades.x, y=densidades.y, colour="Posterior"), size=0.8)+
-    labs(color = "Distribution.", y= "Density", x="Values")+
-    ggtitle("Mean and variance unknown: prior distribution of the mean depends of variance.", subtitle = "Theta") +
+    labs(color = "Distribución", y= "Densidad", x="Valores")+
+    ggtitle("Media y varianza desconocidos: distribución a priori de la media dependiendo de la varianza", subtitle = "Theta") +
     theme_bw()
   
   # Gráfico para apriori de sigma ----
   p_32 = ggplot(data = df4_red, aes(cuant_apr_sigma,den_apri_sigma))+
     geom_line(size = 0.8, color = 3) +
-    labs(y= "Density", x="Values")+
-    ggtitle("Prior distribution", subtitle = "Sigma") +
+    labs(y= "Densidad", x="Valores")+
+    ggtitle("Distribución a priori", subtitle = "Varianza") +
     theme_bw()
   
   # Gráfico para posterior de sigma ----
   p_33 = ggplot(data = df5, aes(den_post_sigma.x,den_post_sigma.y))+
     geom_line(size = 0.8, color = 4) +
-    labs(y= "Density", x="Values")+
-    ggtitle("Posterior distribution", subtitle = "Sigma") +
+    labs(y= "Densidad", x="Valores")+
+    ggtitle("Distribución posterior", subtitle = "Varianza") +
     theme_bw()
-  
-  grid.arrange(p_31, p_32, p_33, ncol = 2, nrow = 2)
+  p_33
+  #grid.arrange(p_31, p_32, p_33, ncol = 2, nrow = 2 )
 
 }
 # g2 <- f_norm_uni(5.5, 2,6, 50, 1,2,5)
