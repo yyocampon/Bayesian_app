@@ -58,9 +58,15 @@ fy_ivgamma <- function(a,b,theta,v,n,s_2){
   sigma_n = sqrt(s_2) # Desviación estándar muestral
   v0 = 2*a # usado para calcular los parámetros alpha y beta de la distribuiones a priori y posterior de sigma^2
   sigma0_2 = (2*b)/v0 # usado para calcular los parámetros alpha y beta de la distribuiones a priori y posterior de sigma^2
-  v= v # usado para calcular los parámetros alpha y beta de la distribuiones a priori y posterior de sigma^2
+  
+  #Distribución de verosimilitud
+  veros <- rnorm(100000,mean = theta,sd = sigma_n)
+  dens_vero <- density(veros)
+  veros_m = sample(veros, n)
+  v_1=sum((veros_m-theta)^2)/n # usado para calcular los parámetros alpha y beta de la distribuiones a priori y posterior de sigma^2
+  
   v0_n = (v0+n)/2 # Cálculo del parámetro alpha de la distribución gamma inversa a priori de sigma^2
-  v_n = (n*v+v0*sigma0_2)/2 # usado para calcular el parámetro beta de la distribución posterior de sigma2
+  v_n = (n*v_1+v0*sigma0_2)/2 # usado para calcular el parámetro beta de la distribución posterior de sigma2
   
 
   x = seq(0.1,0.99,length.out = 100000)
@@ -72,10 +78,8 @@ fy_ivgamma <- function(a,b,theta,v,n,s_2){
   df4_red = df4[df4$cuant_apr_sigma<cuant_apr_sigma[min(which(P(cuant_apr_sigma) >0.99))],]
   
   dposterior <-  rinvgamma(100000,shape = v0_n,scale = 1/v_n)
-  veros <- rnorm(100000,mean = theta,sd = sigma_n)
   dens_pos <- density(dposterior)
-  dens_vero <- density(veros)
-  
+
   df2 = data.frame(dens_pos$x,dens_pos$y)
   df3 = data.frame(dens_vero$x,dens_vero$y)
   
@@ -97,14 +101,14 @@ fy_ivgamma <- function(a,b,theta,v,n,s_2){
     ggtitle("Varianza desconocida - Verosimilitud") +
     theme_bw()
   p_23
- # grid.arrange(p_21, p_22, p_23, ncol = 2, nrow = 2 )
+  grid.arrange(p_21, p_22, p_23, ncol = 2, nrow = 2 )
 
 }
 
-# fy_ivgamma(a = 1100, b = 250000,theta = 220, v= 395.83,n=12, s_2 = 396.78)
-# fy_ivgamma(a = 30, b = 30,theta = 12, v= 0.5,n=100, s_2 = 25)
-# fy_ivgamma(a = 1, b = 1,theta = 180, v= 193.83,n=30, s_2 = 400)
-# fy_ivgamma(a = 1, b = 0.1,theta =5, v= 4,n=5, s_2 = 4)
+fy_ivgamma(a = 1100, b = 250000,theta = 220, v= 395.83,n=12, s_2 = 396.78)
+fy_ivgamma(a = 30, b = 30,theta = 12, v= 0.5,n=100, s_2 = 25)
+fy_ivgamma(a = 1, b = 1,theta = 180, v= 193.83,n=30, s_2 = 400)
+fy_ivgamma(a = 1, b = 0.1,theta =5, v= 4,n=5, s_2 = 4)
 #-------------------------------------------------------------
 
 # Modelos paramétricos.
