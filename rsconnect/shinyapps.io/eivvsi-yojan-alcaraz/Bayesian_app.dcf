@@ -5,9 +5,9 @@ account: eivvsi-yojan-alcaraz
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 6817173
-bundleId: 6221450
+bundleId: 6221461
 url: https://eivvsi-yojan-alcaraz.shinyapps.io/Bayesian_app/
-when: 1661030096.41407
-lastSyncTime: 1661030096.41409
+when: 1661030589.91274
+lastSyncTime: 1661030589.91278
 asMultiple: FALSE
 asStatic: FALSE

@@ -1,6 +1,10 @@
 library(shiny)
 library(shinythemes)
 library(shinydashboard)
+library(invgamma)
+library(ggplot2)
+library(plotly)
+library(fontawesome)
 
 ui <- dashboardPage(skin = "green",
     dashboardHeader(

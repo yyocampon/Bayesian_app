@@ -11,7 +11,7 @@
 
 
 
-<title>Explanation models</title>
+<title>Modelos normales bayesianos conjugados</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -361,7 +361,7 @@ pre code {
 
 
 
-<h1 class="title toc-ignore">Explanation models</h1>
+<h1 class="title toc-ignore">Modelos normales bayesianos conjugados</h1>
 
 </div>
 
@@ -370,107 +370,111 @@ pre code {
 body {
 text-align: justify}
 </style>
-<div id="introduction" class="section level3">
-<h3>1. Introduction</h3>
-<p>Welcome! This application allows to show the effect of observed data
-and a priori distribution on posterior distribution. This effect is
-illustrated with the conjugate normal model. Let us remember that
-Bayesian perspective quantifies the belief in the occurrence of an event
-from a concept of subjective probability. For this we establish a
-probability distribution for the observations of the event
-p(<strong>y</strong> <span class="math inline">\(\mid\theta\)</span>),
-and a probability distribution for the parameters p(<span class="math inline">\(\theta\)</span>), they are considered as random
-variables. Later, they are used in the Bayes theorem with the purpose of
-updating the belief and inferring about parameters and future
-observations through posterior distribution that belongs to a family of
-known distributions:</p>
+<div id="introducción" class="section level3">
+<h3>1. Introducción</h3>
+<p>¡Bienvenido! Esta aplicación permite mostrar el efecto de los datos
+observados y la distribución a priori sobre la distribución posterior de
+los parámetros del modelo. Este efecto se ilustra con el modelo normal
+conjugado. Recordemos que la perspectiva bayesiana cuantifica la
+creencia en la ocurrencia de un evento a partir de un concepto de
+probabilidad subjetiva. Para ello establecemos una distribución de
+probabilidad para las observaciones del suceso p(<strong>y</strong>
+<span class="math inline">\(\mid\theta\)</span>), y una distribución de
+probabilidad para los parámetros p(<span class="math inline">\(\theta\)</span>), que se consideran variables
+aleatorias. Posteriormente, estas se utilizan en el teorema de Bayes con
+el fin de actualizar la creencia e inferir sobre los parámetros y las
+observaciones futuras a través de la distribución posterior que
+pertenece a una familia de distribuciones conocidas:</p>
 <center>
 p(<span class="math inline">\(\theta\mid\)</span>) <span class="math inline">\(\propto\)</span> p(<span class="math inline">\(\mid\theta\)</span>) p(<span class="math inline">\(\theta\)</span>)
 </center>
-<p>The application uses the following cases of the normal conjugate
-model.</p>
+<p>Esta aplicación utiliza los casos del modelo normal conjugado
+descritos a continuación.</p>
 </div>
-<div id="unknown-mean-with-known-variance." class="section level3">
-<h3>2. Unknown mean with known variance.</h3>
-<div id="likelihood-distribution" class="section level4">
-<h4><strong>2.1 Likelihood distribution</strong></h4>
-<p>Suppose we have <span class="math inline">\(\textbf{y} =(y_1,…,y_n
-)\)</span> a vector of independent observations such that <span class="math inline">\(\textbf{y} \overset{\text{i.i.d.}}{\sim}
-N(\theta,\sigma ^2)\)</span> with <span class="math inline">\(\sigma^2\)</span>,therefore, the likelihood
-distribution is:</p>
+<div id="media-desconocida-su-estimación-con-varianza-conocida." class="section level3">
+<h3>2. Media desconocida: su estimación con varianza conocida.</h3>
+<div id="distribución-de-verosimilitud" class="section level4">
+<h4><strong>2.1 Distribución de verosimilitud</strong></h4>
+<p>Supongamos que tenemos <span class="math inline">\(\textbf{y}
+=(y_1,…,y_n )\)</span> un vector de observaciones independientes tal que
+<span class="math inline">\(\textbf{y} \overset{\text{i.i.d.}}{\sim}
+N(\theta,\sigma ^2)\)</span> con <span class="math inline">\(\sigma^2\)</span>, por lo tanto, la verosimilitud
+es:</p>
 <center>
 <span class="math inline">\(p(\textbf{y}\mid\theta) = \prod_{i=1}^{n}
 \frac{1}{\sqrt{2\pi\sigma ^2}} \times\exp \left(\frac{-1}{2\sigma^2}
 (y_i - \theta )^2\right)\)</span>,
 </center>
 </div>
-<div id="prior-distribution" class="section level4">
-<h4><strong>2.2 Prior distribution</strong></h4>
-<p>The prior distribution of <span class="math inline">\(\theta\)</span>
-is given by <span class="math inline">\(\theta\sim N(\mu_0,\tau_0
-^2)\)</span>, whose hyperparameters <span class="math inline">\(\theta\)</span> and <span class="math inline">\(\tau_0^2\)</span> are known. Then,</p>
+<div id="distribución-a-priori-para-boldsymboltheta" class="section level4">
+<h4><strong>2.2 Distribución a priori para</strong> <span class="math inline">\(\boldsymbol{\theta}\)</span></h4>
+<p>La distribución a priori para <span class="math inline">\(\theta\)</span> está dada por <span class="math inline">\(\theta\sim N(\mu_0,\tau_0 ^2)\)</span>, cuyos
+hiperparámetros <span class="math inline">\(\theta\)</span> and <span class="math inline">\(\tau_0^2\)</span> son conocidos. Luego,</p>
 <center>
 <span class="math inline">\(p(\theta) = \frac{1}{\sqrt{2\pi \tau_0 ^2}}
 \times\exp \left(\frac{-1}{2\tau_0^2} (\theta -
 \mu_0)^2\right)\)</span>,
 </center>
 </div>
-<div id="posterior-distribution" class="section level4">
-<h4><strong>2.3 Posterior distribution</strong></h4>
-<p>The posterior distribution for <span class="math inline">\(\theta\)</span> is <span class="math inline">\(\theta\mid\textbf{y} \sim\)</span> N<span class="math inline">\((\theta \mid \mu_n,\tau_n ^2 )\)</span>, with
-this,</p>
+<div id="distribución-posterior-para-boldsymboltheta" class="section level4">
+<h4><strong>2.3 Distribución posterior para</strong> <span class="math inline">\(\boldsymbol{\theta}\)</span></h4>
+<p>La distribución posterior para <span class="math inline">\(\theta\)</span> es <span class="math inline">\(\theta\mid\textbf{y} \sim N(\theta \mid
+\mu_n,\tau_n ^2 )\)</span>, con esto,</p>
 <center>
 <span class="math inline">\(p(\theta\mid\textbf{y}) \propto \times\exp
 \left(\frac{-1}{2\tau_n^2} (\theta - \mu_n)^2\right)\)</span>
 </center>
-<p>where <span class="math inline">\(\frac{1}{\tau_n^2} =
-\frac{1}{\sigma ^2} + \frac{1}{\tau_0^2}\)</span> and <span class="math inline">\(\mu_n\)</span> is the new mean of <span class="math inline">\(\theta\)</span>, composed of the weighted average
-between the a priori mean and the sample mean with weights sample mean
-with weights proportional to their respective precisions, <span class="math inline">\(\mu_n = \frac{\sum_{i=1}^{n}y_i \tau_n^2 + \mu_n
-\sigma^2}{\tau_n^2 + \sigma^2}\)</span></p>
+<p>donde <span class="math inline">\(\frac{1}{\tau_n^2} =
+\frac{1}{\sigma ^2} + \frac{1}{\tau_0^2}\)</span> y <span class="math inline">\(\mu_n\)</span> es la nueva media de <span class="math inline">\(\theta\)</span>, compuesta por la media ponderada
+entre la media a priori y la media muestral con pesos proporcionales a
+sus respectivas precisiones, <span class="math inline">\(\mu_n =
+\frac{\sum_{i=1}^{n}y_i \tau_n^2 + \mu_n \sigma^2}{\tau_n^2 +
+\sigma^2}\)</span></p>
 </div>
-<div id="known-values-and-parameters" class="section level4">
-<h4><strong>2.4 known values and parameters</strong></h4>
-<p>Each of the values required for the calculation of the distributions
-is described below:</p>
+<div id="valores-y-parámetros-conocidos" class="section level4">
+<h4><strong>2.4 Valores y parámetros conocidos</strong></h4>
+<p>A continuación se describe cada uno de los valores necesarios para el
+cálculo de las distribuciones:</p>
 <ul>
-<li><strong>Sample size</strong> (<span class="math inline">\(n\)</span>)</li>
-<li><strong>Variance</strong> (<span class="math inline">\(\sigma
-^2\)</span>): It’s the population variance.</li>
+<li><strong>Tamaño muestral</strong> (<span class="math inline">\(n\)</span>)</li>
+<li><strong>Varianza conocida</strong> (<span class="math inline">\(\sigma ^2\)</span>): Es la variación de la
+población.</li>
 </ul>
-<p>Both values are needed to simulate the data set.</p>
+<p>Ambos valores son necesarios para simular el conjunto de datos.</p>
 <ul>
-<li><strong>Sample mean</strong> (<span class="math inline">\(\bar{y_n}\)</span>): the priori mean is estimated
-based on this value, as follows <span class="math inline">\(\mu_0 =
-\bar{y_n} \pm d\sigma\)</span></li>
-<li><strong>Standard deviation number</strong> (<span class="math inline">\(d\)</span>): It indicates how many standard
-deviations we want the a priori mean of the sample mean. Thus, it can be
-set in a range of <span class="math inline">\(\pm 3\)</span> standard
-deviations with steps of <span class="math inline">\(0.5\)</span>.</li>
-<li><strong>Prior standard deviation</strong> (<span class="math inline">\(\tau_0\)</span>)</li>
+<li><strong>Media muestral</strong> (<span class="math inline">\(\bar{y}_n\)</span>):la media a priori se estima a
+partir de este valor, de la siguiente manera <span class="math inline">\(\mu_0 = \bar{y}_n \pm d\sigma\)</span></li>
+<li><strong>Número de desviaciones estándar</strong> (<span class="math inline">\(d\)</span>): It indicates how many standard
+deviations we want the a priori mean of the sample mean. Indica cuántas
+desviaciones estándar queremos que tenga la media a priori de la
+muestra. Así, puede establecerse en un rango de <span class="math inline">\(\pm 3\)</span> desviaciones estándar con pasos de
+<span class="math inline">\(0.5\)</span>.</li>
+<li><strong>Precisión de la distribución a priori</strong> (<span class="math inline">\(\tau_0\)</span>): Recordemos que la precisión es
+la inversa de la varianza, es decir, <span class="math inline">\(\tau_0
+= \frac{1}{\sigma^2}\)</span>.</li>
 </ul>
 </div>
 </div>
-<div id="known-mean-with-unknown-variance" class="section level3">
-<h3>3. Known mean with unknown variance</h3>
-<div id="likelihood-distribution-1" class="section level4">
-<h4><strong>3.1 Likelihood distribution</strong></h4>
+<div id="varianza-desconocida-su-estimación-con-media-conocida" class="section level3">
+<h3>3. Varianza desconocida: su estimación con media conocida</h3>
+<div id="verosimilitud" class="section level4">
+<h4><strong>3.1 Verosimilitud</strong></h4>
 <p>In this case, it is established that the sampling distribution for a
 vector of observations <span class="math inline">\(\textbf{y}
-=(y_1,…,y_n )\)</span> is a Normal distribution with known mean and
-unknown variance, <span class="math inline">\(\textbf{y}
-\overset{\text{i.i.d.}}{\sim} N(\theta, \sigma ^2)\)</span>, that is,
-the likelihood distribution is given by:</p>
+=(y_1,…,y_n )\)</span> es una distribución Normal con media conocida y
+varianza desconocida, <span class="math inline">\(\textbf{y}
+\overset{\text{i.i.d.}}{\sim} N(\theta, \sigma ^2)\)</span>, es decir,
+la distribución de probabilidad viene dada por:</p>
 <center>
 <p><span class="math inline">\(p(\textbf{y}\mid\sigma^2) =
 \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi \sigma ^2}} \times\exp
 \left(\frac{-1}{2\sigma ^2} (y_i - \mu )^2\right)\)</span></p>
 </center>
 </div>
-<div id="prior-distribution-1" class="section level4">
-<h4><strong>3.2 Prior distribution</strong></h4>
-<p>The priori distribution for <span class="math inline">\(\sigma^2\)</span> is <span class="math inline">\(\sigma^2\sim Inverse - Gamma
-\left(\frac{v_0}{2},\frac{v_0 \sigma_0^2}{2}\right)\)</span>, then,</p>
+<div id="distribución-a-priori-para-boldsymbolsigma2" class="section level4">
+<h4><strong>3.2 Distribución a priori para</strong> <span class="math inline">\(\boldsymbol{\sigma^2}\)</span></h4>
+<p>La distribución a priori para <span class="math inline">\(\sigma^2\)</span> es <span class="math inline">\(\sigma^2\sim Inverse - Gamma
+\left(\frac{v_0}{2},\frac{v_0 \sigma_0^2}{2}\right)\)</span>, luego,</p>
 <center>
 <span class="math inline">\(p(\sigma^2) = \frac{ \left(\frac{\nu_0
 \sigma_0^2}{2}\right) ^ {\frac{\nu_{0}}{2}} }{\Gamma
@@ -478,12 +482,12 @@ the likelihood distribution is given by:</p>
 \times\exp \left(-\frac{\nu_0 \sigma_0^2}{\sigma ^2}\right)\)</span>
 </center>
 </div>
-<div id="posterior-distribution-1" class="section level4">
-<h4><strong>3.3 Posterior distribution</strong></h4>
-<p>The posterior distribution for theta is given by</p>
+<div id="distribución-posterior-para-boldsymbolsigma2" class="section level4">
+<h4><strong>3.3 Distribución posterior para</strong> <span class="math inline">\(\boldsymbol{\sigma^2}\)</span></h4>
+<p>La distribución posterior de theta viene dada por:</p>
 <p><span class="math inline">\(\sigma^2\mid\textbf{y} \sim Inverse -
 Gamma \left(\frac{\nu_0 + n}{2},\frac{n\nu+ v_0 \sigma
-^2}{2}\right)\)</span>, then:</p>
+^2}{2}\right)\)</span>, así:</p>
 <center>
 <span class="math inline">\(p(\sigma^2\mid\textbf{y}) \propto
 (\sigma^2)^{-\frac{n}{2}}  \times\exp
@@ -491,57 +495,57 @@ Gamma \left(\frac{\nu_0 + n}{2},\frac{n\nu+ v_0 \sigma
 ^2)^{-\frac{v_0}{2+1}}  \times\exp \left({\frac{-\nu_0
 \sigma_0^2}{2\sigma ^2}}\right)\)</span>
 </center>
-<p>where <span class="math inline">\(\nu = \frac{1}{n}\sum_{i=1}^{n}
+<p>donde <span class="math inline">\(\nu = \frac{1}{n}\sum_{i=1}^{n}
 (y_i - \theta)^2\)</span></p>
 </div>
-<div id="known-values-and-parameters-1" class="section level4">
-<h4><strong>3.4 Known values and parameters</strong></h4>
-<p>Each of the values required for the calculation of the distributions
-is described below:</p>
+<div id="valores-y-parámetros-conocidos-1" class="section level4">
+<h4><strong>3.4 Valores y parámetros conocidos</strong></h4>
+<p>A continuación se describe cada uno de los valores necesarios para el
+cálculo de las distribuciones:</p>
 <ul>
-<li><strong>Sample size</strong> (<span class="math inline">\(n\)</span>).</li>
-<li><strong>Media</strong> (<span class="math inline">\(\mu\)</span>):
-It’s the population mean.</li>
-<li><strong>Sample variance</strong> (<span class="math inline">\(s^2\)</span>): Variability we want the likelihood
-distribution to have.</li>
+<li><strong>Tamaño muestral</strong> (<span class="math inline">\(n\)</span>).</li>
+<li><strong>Media conocida</strong> (<span class="math inline">\(\mu\)</span>): Es la varianza poblacional.</li>
+<li><strong>Varianza muestral</strong> (<span class="math inline">\(s^2\)</span>): Variabilidad que queremos que tenga
+la distribución de verosimilitud.</li>
 </ul>
 <p>Both values are needed to simulate the data set.</p>
 <ul>
-<li><span class="math inline">\(\boldsymbol{\nu}\)</span>: It
-corresponds to the squared sums of the differences between the observed
-values and the known mean. It takes values from 0.1 to 5, with step of
-0.1.</li>
-<li><strong>First hyperparameter</strong> <span class="math inline">\((\boldsymbol{\alpha})\)</span>: <span class="math inline">\(\frac{\nu_0}{2}\)</span>. It is the scaling
-parameter of the prior distribution por <span class="math inline">\(\sigma^2\)</span>.</li>
-<li><strong>Second hyperparameter</strong> <span class="math inline">\((\boldsymbol{\beta})\)</span>: <span class="math inline">\(\frac{\nu_0\sigma_0^2}{2}\)</span>. It is the
-shape parameter of the prior distribution for <span class="math inline">\(\sigma^2\)</span>.</li>
+<li><span class="math inline">\(\boldsymbol{\nu}\)</span>: Corresponde a
+las sumas al cuadrado de las diferencias entre los valores observados y
+la media conocida. Toma valores de 0,1 a 5, con paso de 0,1 y debe ser
+ingresada por el usuario.</li>
+<li><strong>Primer hiperparámetro</strong> <span class="math inline">\((\boldsymbol{\alpha})\)</span>: <span class="math inline">\(\frac{\nu_0}{2}\)</span>. Es el parámetro de
+escala de la distribución a priori para <span class="math inline">\(\sigma^2\)</span>.</li>
+<li><strong>Segundo hiperparámetro</strong> <span class="math inline">\((\boldsymbol{\beta})\)</span>: <span class="math inline">\(\frac{\nu_0\sigma_0^2}{2}\)</span>. Es el
+parámetro de forma de la distribución a priori para <span class="math inline">\(\sigma^2\)</span>.</li>
 </ul>
 </div>
 </div>
-<div id="mean-and-unknown-variance-with-a-priori-distribution-of-the-mean-depending-on-the-variance" class="section level3">
-<h3>4. Mean and unknown variance with a priori distribution of the mean
-depending on the variance</h3>
-<div id="likelihood-distribution-2" class="section level4">
-<h4><strong>4.1 Likelihood distribution</strong></h4>
-<p>This case refers to a multiparametric model. Let <span class="math inline">\(\textbf{y} =(y_1,…,y_n )\)</span> a vector of
-independent observations that distributes <span class="math inline">\(\textbf{y} \overset{\text{i.i.d.}}{\sim}
-N(\theta,\sigma ^2)\)</span> with unknown <span class="math inline">\(\theta\)</span> and <span class="math inline">\(\sigma^2\)</span></p>
+<div id="media-y-varianza-desconocidas-con-la-distribución-a-priori-de-la-media-en-función-de-la-varianza." class="section level3">
+<h3>4. Media y varianza desconocidas con la distribución a priori de la
+media en función de la varianza.</h3>
+<div id="verosimilitud-1" class="section level4">
+<h4><strong>4.1 Verosimilitud</strong></h4>
+<p>Este caso se refiere al modelo normal multiparamétrico. Sea <span class="math inline">\(\textbf{y} =(y_1,…,y_n )\)</span> un vector de
+observaciones independientes que distribuye <span class="math inline">\(\textbf{y} \overset{\text{i.i.d.}}{\sim}
+N(\theta,\sigma ^2)\)</span> con <span class="math inline">\(\theta\)</span> y <span class="math inline">\(\sigma^2\)</span> desconocidas. Así, la
+verosimilitud está dada por:</p>
 <center>
 <span class="math inline">\(p(\textbf{y}\mid\theta,\sigma^2) =
 \frac{1}{(2\pi\sigma^2)^\frac{n}{2}} \times\exp
 \left(\frac{-1}{2\sigma^2} (n-1)s^2 + n
 (\bar{y}-\theta)^2\right)\)</span>,
 </center>
-<p>where <span class="math inline">\(s^2 = \frac{\sum_{i=1}^{n}(y_i -
+<p>donde <span class="math inline">\(s^2 = \frac{\sum_{i=1}^{n}(y_i -
 \bar{y})^2}{n-1}\)</span></p>
 </div>
-<div id="prior-distribution-2" class="section level4">
-<h4><strong>4.2 Prior distribution</strong></h4>
-<p>The prior distribution for <span class="math inline">\(\theta\)</span> is assumed to depend on <span class="math inline">\(\sigma^2\)</span>, <span class="math inline">\(p(\theta\mid\sigma^2)\)</span>, while the a priori
-distribution for <span class="math inline">\(\sigma^2\)</span> doesn’t
-depend on <span class="math inline">\(\theta\)</span> and it can be
-written as <span class="math inline">\(p(\sigma^2)\)</span>. Therefore,
-this case has two distributions a priori:</p>
+<div id="distribuciones-a-priori" class="section level4">
+<h4><strong>4.2 Distribuciones a priori</strong></h4>
+<p>La distribución a priori para <span class="math inline">\(\theta\)</span> se asume que depende de <span class="math inline">\(\sigma^2\)</span>, <span class="math inline">\(p(\theta\mid\sigma^2)\)</span>, mientras que la
+distribución a priori para <span class="math inline">\(\sigma^2\)</span>
+no depende de <span class="math inline">\(\theta\)</span> y puede ser
+escrita como <span class="math inline">\(p(\sigma^2)\)</span>. Por lo
+tanto, este caso tiene dos distribuciones a priori:</p>
 <ul>
 <li><span class="math inline">\(\theta\mid\sigma^2 \sim N\left(\mu_0,
 \frac{\sigma^2}{\kappa_0}\right)\)</span></li>
@@ -549,49 +553,48 @@ this case has two distributions a priori:</p>
 \left(\frac{\nu_0}{2} , \frac{\nu_0 \sigma^2_0}{2}\right)\)</span></li>
 </ul>
 </div>
-<div id="posterior-distribution-2" class="section level4">
-<h4><strong>4.3 Posterior distribution</strong></h4>
-<p>The posterior marginal distribution of <span class="math inline">\(\theta\)</span> is:</p>
+<div id="distribuciones-posteriores" class="section level4">
+<h4><strong>4.3 Distribuciones posteriores</strong></h4>
+<p>La distribución marginal posterior de <span class="math inline">\(\theta\)</span> es:</p>
 <center>
 <span class="math inline">\(\sigma^2\mid\textbf{y}\sim Inverse-Gamma
 \left(\frac{\nu_n}{2} , \frac{\nu_n \sigma^2_n}{2}\right)\)</span>,
 </center>
-<p>where <span class="math inline">\(\nu_n = \nu_0 + n\)</span>, <span class="math inline">\(\sigma^2_n = \frac{\nu_0\sigma^2_0 + (n-1)S^2 +
+<p>donde <span class="math inline">\(\nu_n = \nu_0 + n\)</span>, <span class="math inline">\(\sigma^2_n = \frac{\nu_0\sigma^2_0 + (n-1)S^2 +
 \frac{n\kappa_0(\bar{y_n} - \mu_0)^2}{n +
 \kappa_0}}{n+\nu_0}\)</span></p>
-<p>And the marginal posterior distribution of <span class="math inline">\(\theta\)</span> is:</p>
+<p>Y la distribución marginal posterior de <span class="math inline">\(\theta\)</span> es:</p>
 <center>
 <span class="math inline">\(\theta\mid\textbf{y} \sim t_{n +
 \nu_0}\left(\mu_n, \frac{\sigma^2_n}{\kappa_0 + n}\right)\)</span>,
 </center>
-<p>where <span class="math inline">\(\mu_n = \frac{\mu_0 \kappa_0 +
+<p>donde <span class="math inline">\(\mu_n = \frac{\mu_0 \kappa_0 +
 n\bar{y_n}}{n + \kappa_0}\)</span></p>
 </div>
-<div id="known-values-and-parameters-2" class="section level4">
-<h4><strong>4.4 known values and parameters</strong></h4>
-<p>Each of the values required for the calculation of the distributions
-is described below:</p>
+<div id="valores-y-parámetros-conocidos-2" class="section level4">
+<h4><strong>4.4 Valores y parámetros conocidos</strong></h4>
+<p>A continuación se describe cada uno de los valores necesarios para el
+cálculo de las distribuciones:</p>
 <ul>
-<li><strong>Sample size</strong> (<span class="math inline">\(n\)</span>)</li>
-<li><strong>Sample mean</strong> <span class="math inline">\(\bar{y_n}\)</span></li>
-<li><strong>Sample variance</strong> (<span class="math inline">\(s^2\)</span>): Variability we want the likelihood
-distribution to have</li>
+<li><strong>Tamaño muestral</strong> (<span class="math inline">\(n\)</span>)</li>
+<li><strong>Media muestral</strong> <span class="math inline">\(\bar{y}_n\)</span></li>
+<li><strong>Varianza muestral</strong> (<span class="math inline">\(s^2\)</span>): Variabilidad que queremos que tenga
+la distribución de verosimilitud.</li>
 </ul>
-<p>Both values are needed to simulate the data set.</p>
+<p>Ambos valores son necesarios para simular el conjunto de datos.</p>
 <ul>
-<li><span class="math inline">\(\boldsymbol{\mu_0}:\)</span> represents
-the mean of the a priori distribution conditional on the variance <span class="math inline">\(\sigma^2\)</span> and is a free parameter.</li>
-<li><span class="math inline">\(\boldsymbol{\kappa_0}\)</span>: It is
-the a priori belief that we have about the parameter <span class="math inline">\(\sigma\)</span>, this parameter indicates how much
-uncertainty we have about the parameter <span class="math inline">\(\theta\)</span>, if there is a lot of uncertainty
-<span class="math inline">\(\kappa_0\)</span> takes small values, but if
-there is enough knowledge about <span class="math inline">\(\theta\)</span>, <span class="math inline">\(\kappa_0\)</span> takes large values. It should be
-noted that <span class="math inline">\(\kappa_0\)</span> takes only
-positive values.</li>
-<li><span class="math inline">\(\boldsymbol{\alpha_0}:\)</span> It’s the
-shape parameter for the prior distribution of sigma distribution. <span class="math inline">\(\alpha_0 = \frac{\nu_0}{2}\)</span></li>
-<li><span class="math inline">\(\boldsymbol{\beta_0}\)</span>: It’s the
-scale parameter for the prior distribution of sigma. <span class="math inline">\(\beta_0 = \frac{\nu_0 \sigma_0^2}{2}\)</span></li>
+<li><span class="math inline">\(\boldsymbol{\mu_0}:\)</span> representa
+la media de la distribución a priori condicionada a la varianza <span class="math inline">\(\sigma^2\)</span> y es un parámetro libre.</li>
+<li><span class="math inline">\(\boldsymbol{\kappa_0}\)</span>:Es la
+creencia a priori que tenemos sobre el parámetro <span class="math inline">\(\sigma\)</span>, este parámetro indica el grado de
+incertidumbre que tenemos sobre el parámetro <span class="math inline">\(\theta\)</span>, si hay mucha incertidumbre <span class="math inline">\(\kappa_0\)</span> toma valores pequeños, pero si
+hay suficiente conocimiento sobre <span class="math inline">\(\theta\)</span>, <span class="math inline">\(\kappa_0\)</span> toma valores grandes. Hay que
+tener en cuenta que <span class="math inline">\(\kappa_0\)</span> solo
+toma valores positivos.</li>
+<li><span class="math inline">\(\boldsymbol{\alpha_0}:\)</span> Es el
+parámetro de forma de la distribución a priori de sigma. <span class="math inline">\(\alpha_0 = \frac{\nu_0}{2}\)</span></li>
+<li><span class="math inline">\(\boldsymbol{\beta_0}\)</span>: Es el
+parámetro de escala para la distribución a priori de sigma. <span class="math inline">\(\beta_0 = \frac{\nu_0 \sigma_0^2}{2}\)</span></li>
 </ul>
 </div>
 </div>
