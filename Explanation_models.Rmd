@@ -1,0 +1,171 @@
+---
+title: "Explanation models"
+output: html_document
+---
+
+<style>
+body {
+text-align: justify}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 1. Introduction
+
+Welcome! This application allows to show the effect of observed data and a priori distribution on posterior distribution. This effect is illustrated with the conjugate normal model.
+Let us remember that Bayesian perspective quantifies the belief in the occurrence of an event from a concept of subjective probability.
+For this we establish a probability distribution for the observations of the event p(**y** $\mid\theta$), and a probability distribution for the parameters p($\theta$), they are considered as random variables. 
+Later, they are used in the Bayes theorem with the purpose of updating the belief and inferring about  parameters and future observations through posterior distribution that belongs to a family of known distributions:
+
+<center>
+p($\theta\mid$\textbf{y}) $\propto$ p(\textbf{y}$\mid\theta$) p($\theta$) 
+</center>
+
+
+The application uses the following cases of the normal conjugate model.
+
+### 2. Unknown mean with known variance.
+
+#### **2.1 Likelihood distribution**
+
+Suppose we have $\textbf{y} =(y_1,…,y_n )$ a vector of independent observations such that $\textbf{y} \overset{\text{i.i.d.}}{\sim} N(\theta,\sigma ^2)$ with $\sigma^2$,therefore, the likelihood distribution is:
+
+<center>
+ $p(\textbf{y}\mid\theta) = \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi\sigma ^2}} \times\exp \left(\frac{-1}{2\sigma^2} (y_i - \theta )^2\right)$,
+ </center>
+ 
+#### **2.2 Prior distribution**
+
+The prior distribution of $\theta$ is given by $\theta\sim N(\mu_0,\tau_0 ^2)$, whose hyperparameters $\theta$ and $\tau_0^2$ are known. Then, 
+
+<center>
+    $p(\theta) = \frac{1}{\sqrt{2\pi \tau_0 ^2}} \times\exp \left(\frac{-1}{2\tau_0^2} (\theta - \mu_0)^2\right)$, 
+    </center>
+    
+#### **2.3 Posterior distribution**
+
+The posterior distribution for $\theta$ is $\theta\mid\textbf{y} \sim$ N$(\theta \mid \mu_n,\tau_n ^2 )$, with this,
+
+<center>
+   $p(\theta\mid\textbf{y}) \propto \times\exp \left(\frac{-1}{2\tau_n^2} (\theta - \mu_n)^2\right)$
+</center>
+
+where $\frac{1}{\tau_n^2} = \frac{1}{\sigma ^2} + \frac{1}{\tau_0^2}$ and 
+$\mu_n$ is the new mean of $\theta$, composed of the weighted average between the a priori mean and the sample mean with weights sample mean with weights proportional to their respective precisions, 
+$\mu_n = \frac{\sum_{i=1}^{n}y_i \tau_n^2 + \mu_n \sigma^2}{\tau_n^2 + \sigma^2}$ 
+
+
+#### **2.4 known values and parameters**
+
+Each of the values required for the calculation of the distributions is described below:
+
+ * **Sample size** ($n$)
+ * **Variance** ($\sigma ^2$): It's the population variance.
+ 
+Both values are needed to simulate the data set.
+
+* **Sample mean** ($\bar{y_n}$): the priori mean is estimated based on this value, as follows $\mu_0 = \bar{y_n} \pm d\sigma$
+* **Standard deviation number** ($d$): It indicates how many standard deviations we want the a priori mean of the sample mean. Thus, it can be set in a range of $\pm 3$ standard deviations with steps of $0.5$.
+* **Prior standard deviation** ($\tau_0$)
+
+### 3. Known mean with unknown variance
+
+#### **3.1 Likelihood distribution**
+
+In this case, it is established that the sampling distribution for a vector of observations $\textbf{y} =(y_1,…,y_n )$ is a Normal distribution with known mean and unknown variance, $\textbf{y} \overset{\text{i.i.d.}}{\sim} N(\theta, \sigma ^2)$,  that is, the likelihood distribution is given by:
+
+<center>
+
+$p(\textbf{y}\mid\sigma^2) = \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi \sigma ^2}} \times\exp \left(\frac{-1}{2\sigma ^2} (y_i - \mu )^2\right)$
+    
+</center>
+
+#### **3.2 Prior distribution**
+
+The priori distribution for $\sigma^2$ is $\sigma^2\sim Inverse - Gamma \left(\frac{v_0}{2},\frac{v_0 \sigma_0^2}{2}\right)$, then,
+
+<center>
+    $p(\sigma^2) = \frac{ \left(\frac{\nu_0 \sigma_0^2}{2}\right) ^ {\frac{\nu_{0}}{2}} }{\Gamma \left(\frac{\nu_0}{2}\right)} (\sigma ^2)^{-\frac{\nu_0}{2}+1} \times\exp \left(-\frac{\nu_0 \sigma_0^2}{\sigma ^2}\right)$
+</center>
+
+#### **3.3 Posterior distribution**
+
+The posterior distribution for theta is given by 
+
+$\sigma^2\mid\textbf{y} \sim Inverse - Gamma \left(\frac{\nu_0 + n}{2},\frac{n\nu+ v_0 \sigma ^2}{2}\right)$, then:
+
+<center>
+   $p(\sigma^2\mid\textbf{y}) \propto (\sigma^2)^{-\frac{n}{2}}
+   \times\exp \left({{\frac{-n}{2\sigma^2}v}}\right) (\sigma ^2)^{-\frac{v_0}{2+1}} 
+   \times\exp \left({\frac{-\nu_0 \sigma_0^2}{2\sigma ^2}}\right)$
+</center>
+
+where $\nu = \frac{1}{n}\sum_{i=1}^{n} (y_i - \theta)^2$
+
+#### **3.4 Known values and parameters**
+
+Each of the values required for the calculation of the distributions is described below:
+
+* **Sample size** ($n$).
+* **Media** ($\mu$): It's the population mean.
+* **Sample variance** ($s^2$): Variability we want the likelihood distribution to have.
+ 
+Both values are needed to simulate the data set.
+
+* $\boldsymbol{\nu}$: It corresponds to the squared sums of the differences between the observed values and the known mean. It takes values from 0.1 to 5, with step of 0.1.
+* **First hyperparameter** $(\boldsymbol{\alpha})$: $\frac{\nu_0}{2}$. It is the scaling parameter of the prior distribution por $\sigma^2$.
+* **Second hyperparameter** $(\boldsymbol{\beta})$: $\frac{\nu_0\sigma_0^2}{2}$. It is the shape parameter of the prior distribution for $\sigma^2$.
+
+### 4. Mean and unknown variance with a priori distribution of the mean depending on the variance
+
+#### **4.1 Likelihood distribution**
+
+This case refers to a multiparametric model. Let $\textbf{y} =(y_1,…,y_n )$ a vector of independent observations that distributes $\textbf{y} \overset{\text{i.i.d.}}{\sim} N(\theta,\sigma ^2)$ with unknown $\theta$ and $\sigma^2$ 
+
+<center>
+    $p(\textbf{y}\mid\theta,\sigma^2) = \frac{1}{(2\pi\sigma^2)^\frac{n}{2}} \times\exp \left(\frac{-1}{2\sigma^2} (n-1)s^2 + n (\bar{y}-\theta)^2\right)$,
+</center>
+
+where $s^2 = \frac{\sum_{i=1}^{n}(y_i - \bar{y})^2}{n-1}$
+
+#### **4.2 Prior distribution**
+
+The prior distribution for $\theta$ is assumed to depend on $\sigma^2$, $p(\theta\mid\sigma^2)$, while the a priori distribution for $\sigma^2$ doesn't depend on $\theta$ and it can be written as $p(\sigma^2)$. Therefore, this case has two distributions a priori: 
+
+* $\theta\mid\sigma^2 \sim N\left(\mu_0, \frac{\sigma^2}{\kappa_0}\right)$
+* $\sigma^2 \sim Inverse - Gamma \left(\frac{\nu_0}{2} , \frac{\nu_0 \sigma^2_0}{2}\right)$
+
+#### **4.3 Posterior distribution**
+
+The posterior marginal distribution of $\theta$ is:
+
+<center>
+$\sigma^2\mid\textbf{y}\sim Inverse-Gamma \left(\frac{\nu_n}{2} , \frac{\nu_n \sigma^2_n}{2}\right)$,
+</center>
+
+where $\nu_n = \nu_0 + n$, $\sigma^2_n = \frac{\nu_0\sigma^2_0 + (n-1)S^2 + \frac{n\kappa_0(\bar{y_n} - \mu_0)^2}{n + \kappa_0}}{n+\nu_0}$ 
+
+And the marginal posterior distribution of $\theta$ is: 
+
+<center>
+$\theta\mid\textbf{y} \sim t_{n + \nu_0}\left(\mu_n, \frac{\sigma^2_n}{\kappa_0 + n}\right)$, 
+</center>
+
+where $\mu_n = \frac{\mu_0 \kappa_0 + n\bar{y_n}}{n + \kappa_0}$
+
+#### **4.4 known values and parameters**
+
+Each of the values required for the calculation of the distributions is described below:
+
+* **Sample size** ($n$)
+* **Sample mean** $\bar{y_n}$
+* **Sample variance** ($s^2$): Variability we want the likelihood distribution to have
+
+Both values are needed to simulate the data set.
+
+* $\boldsymbol{\mu_0}:$ represents the mean of the a priori distribution conditional on the variance $\sigma^2$ and is a free parameter.
+* $\boldsymbol{\kappa_0}$: It is the a priori belief that we have about the parameter $\sigma$, this parameter indicates how much uncertainty we have about the parameter $\theta$, if there is a lot of uncertainty $\kappa_0$ takes small values, but if there is enough knowledge about $\theta$, $\kappa_0$ takes large values. It should be noted that $\kappa_0$ takes only positive values.
+* $\boldsymbol{\alpha_0}:$ It's the shape parameter for the prior distribution of sigma distribution. $\alpha_0 = \frac{\nu_0}{2}$
+* $\boldsymbol{\beta_0}$: It's the scale parameter for the prior distribution of sigma. $\beta_0 = \frac{\nu_0 \sigma_0^2}{2}$
