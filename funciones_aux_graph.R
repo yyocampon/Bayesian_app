@@ -52,8 +52,8 @@ fx_norm_n = function(t0,d,variance,yn,n){
 
 
 # Función para graficar el modelo conjugado con varianza desconocida ----
-fy_ivgamma <- function(a,b,theta,v,n,s_2){
-  
+fy_ivgamma <- function(a,b,theta,n,s_2){
+
   # Parámetros calculados  -------
   sigma_n = sqrt(s_2) # Desviación estándar muestral
   v0 = 2*a # usado para calcular los parámetros alpha y beta de la distribuiones a priori y posterior de sigma^2
@@ -105,10 +105,10 @@ fy_ivgamma <- function(a,b,theta,v,n,s_2){
 
 }
 
-fy_ivgamma(a = 1100, b = 250000,theta = 220, v= 395.83,n=12, s_2 = 396.78)
-fy_ivgamma(a = 30, b = 30,theta = 12, v= 0.5,n=100, s_2 = 25)
-fy_ivgamma(a = 1, b = 1,theta = 180, v= 193.83,n=30, s_2 = 400)
-fy_ivgamma(a = 1, b = 0.1,theta =5, v= 4,n=5, s_2 = 4)
+fy_ivgamma(a = 1100, b = 250000,theta = 220,n=12, s_2 = 396.78)
+fy_ivgamma(a = 30, b = 30,theta = 12,n=100, s_2 = 25)
+fy_ivgamma(a = 1, b = 1,theta = 180,n=30, s_2 = 400)
+fy_ivgamma(a = 1, b = 0.1,theta =5,n=5, s_2 = 4)
 #-------------------------------------------------------------
 
 # Modelos paramétricos.
