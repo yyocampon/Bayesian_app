@@ -41,13 +41,13 @@ fx_norm_n = function(t0,d,variance,yn,n){
     geom_line(data=df2, aes(x=xx, y=fy2, colour="Posterior"), size=0.8) +
     geom_line(data=df3, aes(x=xx, y=fy3, colour="Verosimilitud"), size=0.8) +
     theme_bw() +
-    labs(color="Distribución", y= "Densidad", x="Valores") +
+    labs(color="Distribución", y= "Densidad", x=expression(sigma^2)) +
     ggtitle("Media desconocida y varianza conocida.") 
 
   p_1 #Gráfico
 }
 
-# fx_norm_n(t0=40 ,d = 3,variance = 1600 ,yn = 150,n = 100)
+#fx_norm_n(t0=40 ,d = 3,variance = 1600 ,yn = 150,n = 100)
 # fx_norm_n(t0=15 ,d = 2,variance = 1600 ,yn = 150,n = 50)
 
 
@@ -85,13 +85,13 @@ fy_ivgamma <- function(a,b,theta,n,s_2){
   
   p_21 = ggplot(data=df4_red, aes(x=cuant_apr_sigma, y=den_apri_sigma)) + 
     geom_line(size = 0.8, col = 3) +
-    labs(color = "Dsitribución", y= "Densidad", x="Valores")+
+    labs(color = "Dsitribución", y= "Densidad", x=expression(sigma^2))+
     ggtitle("varianza desconocida - A priori") +
     theme_bw()
   
   p_22 = ggplot() + 
     geom_line(data = df2, aes(x=dens_pos.x, y=dens_pos.y), size=0.8, col = 4)+
-    labs(color = "Distribución.", y= "Densidad", x="Valores")+
+    labs(color = "Distribución.", y= "Densidad", x=expression(sigma^2))+
     ggtitle("Varianza desconocida - Posterior") +
     theme_bw()
   
@@ -190,20 +190,20 @@ f_norm_uni = function(y_barn, S_y, mu0, kappa_0, alpha_0, beta_0, n){
   # Gráfico para apriori de sigma ----
   p_32 = ggplot(data = df4_red, aes(cuant_apr_sigma,den_apri_sigma))+
     geom_line(size = 0.8, color = 3) +
-    labs(y= "Densidad", x="Valores")+
+    labs(y= "Densidad", x=expression(sigma^2))+
     ggtitle("Distribución a priori", subtitle = "Varianza") +
     theme_bw()
   
   # Gráfico para posterior de sigma ----
   p_33 = ggplot(data = df5, aes(den_post_sigma.x,den_post_sigma.y))+
     geom_line(size = 0.8, color = 4) +
-    labs(y= "Densidad", x="Valores")+
+    labs(y= "Densidad", x=expression(sigma^2))+
     ggtitle("Distribución posterior", subtitle = "Varianza") +
     theme_bw()
   p_33
-  #grid.arrange(p_31, p_32, p_33, ncol = 2, nrow = 2 )
+  grid.arrange(p_31, p_32, p_33, ncol = 2, nrow = 2 )
 
 }
-# g2 <- f_norm_uni(5.5, 2,6, 50, 1,2,5)
+ g2 <- f_norm_uni(5.5, 2,6, 50, 1,2,5)
 # g2 <- f_norm_uni(26.21,115.35,25,5,1,1,66)
 # ggplotly(g2)
