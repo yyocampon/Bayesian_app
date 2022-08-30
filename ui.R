@@ -1,76 +1,104 @@
 library(shiny)
 library(shinythemes)
-library(shinydashboard)
-library(invgamma)
-library(ggplot2)
 library(plotly)
-library(fontawesome)
-library(gridExtra)
+library(shinycssloaders)
+#library(html5)
+library(markdown)
 
-
-ui <- dashboardPage(skin = "green",
-    dashboardHeader(
-        title = "Modelos conjugados.",
-        titleWidth = 400
-    ),
-    
-    dashboardSidebar(width = 400,
-        sidebarMenu(
-            menuItem("Inicio", tabName = "home",icon = icon("home",verify_fa = FALSE)),
-            menuItemOutput("item_data"),
-            menuItemOutput("item_prior"),
-            menuItemOutput("item_graphic")
-        )
-    ),
-    
-    dashboardBody(
-        tabItems(
-            tabItem("home",
-                fluidRow(
-                    column(width = 6,
-                        selectInput("distribution_type",
-                        "Verosimilitud",
+shinyUI(fluidPage(
+    theme = shinytheme("flatly"),
+    titlePanel("Modelos conjugados normales"),
+    sidebarLayout(
+        
+        sidebarPanel(
+            
+            numericInput("numberObservations",
+                         "Ingrese la cantidad de observaciones",
+                         value = 1),
+            
+            
+            selectInput("cono_parametros_med",
+                        "Media: escoge el escenario",
                         selected = "",
-                        choices = c("","Normal")
-                        )
-                    )
-                ),
-                fluidRow(
-                    column( width = 6,
-                        uiOutput("mean_input"),
-                        uiOutput("variance_input")
-                    ),
-                    column(width = 6,
-                        uiOutput("conditional_input")
-                    )
-                )   
+                        choices = c("","Conocida","Desconocida")
             ),
-            tabItem("likelihood_item",
-                fluidRow(
-                  column(width = 6,
-                         numericInput("numberObservations",
-                              "Ingrese la cantidad de observaciones",
-                              value = 0)
-                  )
-                ),
-                uiOutput("data_parameters")
+            selectInput(inputId = "cono_parametros_var",
+                        label = "Varianza: escoge el escenario",                            
+                        selected = "",
+                        choices = c("","Conocida","Desconocida")
             ),
+            conditionalPanel(condition = "input.cono_parametros_med=='Desconocida' & input.cono_parametros_var=='Desconocida'",
+                             selectInput("conditioned_means",
+                                         "Media condicional: escoge el escenario",
+                                         selected = "Media condicionada",
+                                         choices = c("","Media condicionada","Media no condicionada")
+                             )
             
-            tabItem("prior_item",
-                uiOutput("prior_parameters_norm"),
             ),
-            
-            tabItem("show_item",
-                h4("Modelo normal conjugado:",  align = "center"),
-                tabsetPanel(
-                    tabPanel("Gráfico",
-                    plotlyOutput("distPlot")
-                    ),
-                    tabPanel("Teoría", htmlOutput("teoria"))
+            div(actionButton("buttonGraph", "Generar Gráfico"), align = "center"),
+            h5("Integrantes:"),
+            tags$ul(
+                tags$li(tags$a(href="mailto:yyocampon@unal.edu.co", "Yeison Yovany Ocampo Naranjo")),
+                tags$li(tags$a(href="mailto:xcastaneda@unal.edu.co", "	Ximena Castaneda Ochoa")),
+                tags$li(tags$a(href="mailto:yalcaraz@unal.edu.co", "Yojan Andres Alcaraz Perez"))
+            ),
+            h5("Profesores:"),
+            tags$ul(
+                tags$li(tags$a(href="mailto:iscramirezgu@unal.edu.co", "Isabel Cristina Ramirez Guevara")),
+                tags$li(tags$a(href="mailto:cmlopera@unal.edu.co", "Carlos Mario Lopera Gomez"))
+            ),
+            h5("Correspondencia:"),
+            tags$ul(
+                tags$li(tags$a(href="mailto:iscramirezgu@unal.edu.co", "iscramirezgu@unal.edu.co"))
+            ),
+            img(src="logo_mede_2.png", height = 60, width = 120),
+            img(src=NULL, height = 60, width = 120),
+            img(src="Logo_ESC_ESTAD.png", height = 60, width = 120)
+            #HTML('<center><img src="logo.png"></center>')
+        ),
+        
+        mainPanel(
+            tabsetPanel(type = "pills",
+                        tabPanel(title = "Gráfico",
+            fluidRow(
+                column(4,
+                       uiOutput("data_parameters_norm"),
+                       uiOutput("GraphTitle")
+                ),
+                column(8,
+                       uiOutput("prior_parameters_norm")
+                )
+                ,
+                column(12,
+                          plotlyOutput('distPlot')
+                       )
+                ,
+                column(6,
+                       conditionalPanel(
+                           condition = "input.buttonGraph > 0",
+                           style = "display: none;",
+                           withSpinner(plotlyOutput('distPlot2'))
+                           )
+                       ),
+                column(6,
+                       conditionalPanel(
+                           condition = "input.buttonGraph > 0",
+                           style = "display: none;",
+                           withSpinner(plotlyOutput('distPlot3'))
+                       )
                 )
             )
+        ),
+        #tabPanel(title = "Teoria", htmlOutput("teoria"))
+        #tabPanel("Teoria",includeHTML("include.html"))
+        tabPanel(title = "Teoría",
+                 tags$iframe(style = " height: 400px; width: 100%; scrolling = yes ",
+                             src="Explanation_models_esp.pdf"
+                 )
         )
-    )    
+        )
+        )
+    )
+    
 )
-
- 
+)

@@ -1,167 +1,164 @@
+library(shiny)
+library(invgamma)
+library(ggplot2)
+library(plotly)
+library(gridExtra)
+#library(markdown)
+
+# source where there are auxiliary functions to plot densities
 
 source("funciones_aux_graph.R")
 
-server <- function(input, output) {
-  
 
-  observeEvent(input$distribution_type, {
-    if(input$distribution_type == "Normal"){
-      output$item_data <- renderUI({
-        menuItem("Distribución de verosimilitud", tabName = "likelihood_item", icon = icon("bar-chart",verify_fa = FALSE))
-      })
-      output$mean_input <- renderUI({
-        selectInput("cono_parametros_med",
-                    "Media: escoge el escenario",
-                    selected = "",
-                    choices = c("","Conocida","Desconocida")
-        )
-      })
-      output$variance_input <- renderUI({
-          selectInput("cono_parametros_var",
-                      "Varianza: escoge el escenario",
-                      selected = "",
-                      choices = c("","Conocida","Desconocida")
-          )
-      })
-      output$conditional_input <- renderUI({
-        selectInput("conditioned_means",
-              "Media condicional: escoge el escenario",
-              selected = "",
-              choices = c("","Media condicionada","Media no condicionada")
-        )    
-      })
-    }
-  })
+shinyServer(function(input, output) {
   
+  # generating inputs to likelihood dist with data set information
   
-
-  observeEvent(input$conditioned_means,{
-    if(input$conditioned_means != ""){
-      output$item_prior <- renderUI({
-          menuItem("Distribución a priori", tabName = "prior_item",icon = icon("users",verify_fa = FALSE))
-      })
-      output$item_graphic <- renderUI({
-          menuItem("Gráfico", tabName = "graph_item",
-                   menuSubItem("Mostrar gráfico", tabName = "show_item"),
-                  icon = icon("line-chart",verify_fa = FALSE)
-          
-          )
-      })
-    }
-  })
-
-  output$data_parameters <- renderUI({
-    if(input$cono_parametros_med == 'Conocida' & input$cono_parametros_var == 'Desconocida' & input$conditioned_means == "Media no condicionada"){
-      fluidRow(
-        column(width = 6,
-               numericInput("mean","Ingrese media",
-                            value = 0)
-        ),
-        column(width = 6,
-               numericInput("s_2",
-                            "Ingrese varianza muestral",
-                            value = 0,
-                            min=0)
-          
-        )
-      )
-    }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Conocida' & input$conditioned_means == "Media no condicionada"){
-      fluidRow(
-        column(width = 6,
-               numericInput("yn", "Ingrese la media muestral(y_n)",
-                            value = 0)
-        ),
-        column(width = 6,
-               numericInput("variance","Ingrese la varianza",
-                            value = 0, 
-                            min = 0)
-        )
-      )
-    }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida' & input$conditioned_means == "Media condicionada"){
-      fluidRow(
-        column(width = 6,
-            numericInput("y_barn", "Ingrese la media muestral",
-                  value = 0)     
-        ),
-        column(width = 6,
-               numericInput("S_y", "Ingrese la varianza muestral",
+  output$data_parameters_norm <- renderUI({
+             if(input$cono_parametros_med == 'Conocida' & input$cono_parametros_var == 'Desconocida'){
+               fluidRow(
+                 h5("Parámetro poblacional conocido"),
+               numericInput("mean",HTML("Ingrese  &mu;"),#"Ingrese the mean",
                             value = 0,
                             min = 0)
-        )
-      )
-    }
-      
+               )
+             }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Conocida'){
+               fluidRow(
+                 h5("Parámetro poblacional conocido"),
+               numericInput("variance",HTML("Ingrese  &sigma;<sup>2</sup>"),
+                            value = 1,
+                            min = 0)
+               )
+             } else if (input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida'){
+               fluidRow(
+                 h5("Información muestral"),
+               numericInput("yn_3",HTML("Ingrese  y<sub>n</sub>"),
+                            value = 0.1,
+                            min = 0),
+               numericInput("sn_2_3",HTML("Ingrese  &sigma;<sub>n</sub><sup>2</sup>"),
+                            value = 0.1,
+                            min = 0)
+               )
+             }
+    
   })
   
-  
+  # generating inputs to build aprior information
   
   output$prior_parameters_norm <- renderUI({
-    if(input$cono_parametros_med == 'Conocida' & input$cono_parametros_var == 'Desconocida' & input$conditioned_means == 'Media no condicionada'){
-      verticalLayout(
-        numericInput("Alpha","Ingrese parámetro de escala (alpha)",
-                     value = 0,
-                     min = 0),
-        numericInput("Beta",
-                     "Ingrese parámetro de forma (beta)",
-                     value = 0,
-                     min=0),
-        sliderInput( 'v', label = h3("Ingrese v"), min = 0.1, 
-                     max = 5, value = 1)
+    if(input$cono_parametros_med == 'Conocida' & input$cono_parametros_var == 'Desconocida'){
+      fluidRow(
+        column(6,
+               h5("Parámetros de distribución apriori"),
+               numericInput("Alpha",HTML("Ingrese  &alpha;"),
+                            value = 1,
+                            min = 0),
+               numericInput("Beta",
+                            HTML("Ingrese  &beta;"),
+                            value = 0.1,
+                            min=0)
+               ),
+        column(6,
+               h5("Información muestral"),
+               numericInput("sigma_n",
+                            "Ingrese the sample sigma",
+                            value = 1,
+                            min=0)
+        )
+        
       )
-    }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Conocida' & input$conditioned_means == 'Media no condicionada'){
-      verticalLayout(
-        numericInput("T0","Ingrese T_0",
-                     value = 0,
+    }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Conocida'){
+      fluidRow(
+        column(6,
+               h5("Parámetros de distribución apriori"),
+        numericInput("T0",HTML("Ingrese  &tau;<sub>0</sub>"),
+                     value = 0.1,
                      min = 0),
-        sliderInput( 'k', label = h3("Número de desviaciones estándar"), min = -3, 
+        sliderInput( 'k', label = HTML("Number of standar deviations (&sigma;)"), min = -3, 
                      max = 3, value = 1)
-      )
-      
-    }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida' & input$conditioned_means == "Media condicionada"){
-      verticalLayout(
-        h4("Distribución a priori para theta dada sigma_2"),
-      
-        numericInput("M0", "Ingrese la media a priori",
-                     value = 0
-          
         ),
-        numericInput("kappa_0", "Ingrese la creencia a priori sobre theta",
-                     value = 0,
-                     min = 0
-        ),
-        h4("Distribución a priori para sigma_2"),
-        numericInput("alpha", "Ingrese parámetro de forma (alpha)",
-                     value = 0,
-                     min = 0
-        ),
-        numericInput("beta_", "Ingrese parámetro de escala (beta)",
-                     value = 0,
-                     min = 0
+        column(6,
+               h5("Información muestral"),
+               numericInput("yn",HTML("Ingrese  y<sub>n</sub>"),
+                            value = 0,
+                            min = 0)
         )
       )
+      
+    }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida'){
+      fluidRow(
+        column(6,
+               h5("Apriori parameters"),
+               numericInput("Alpha_3",HTML("Ingrese  &alpha;"),
+                            value = 1,
+                            min = 0),
+               numericInput("Beta_3",
+                            HTML("Ingrese  &beta;"),
+                            value = 2,
+                            min=0)
+               ),
+        column(6,
+               h5("Apriori parameters"),
+               numericInput("kappa_3",HTML("Ingrese  &kappa;"),
+                            value = 50,
+                            min = 0),
+               numericInput("mu0_3",HTML("Ingrese  &mu;<sub>0</sub>"),
+                            value = 0.1,
+                            min = 0)
+               
+               )
+      )
     }
   })
   
-  getPage<-function() {
-    return(includeHTML("Explanation_models.html"))
-  }
-  output$teoria<-renderUI({getPage()})
 
   
-  output$distPlot<- renderPlotly({
-    if(input$cono_parametros_med == 'Conocida' & input$cono_parametros_var == 'Desconocida' & input$conditioned_means == 'Media no condicionada'){
-      g1 = fy_ivgamma(a = input$Alpha, b = input$Beta,theta = input$mean, v= input$v ,n= input$numberObservations, s_2 = input$s_2)
-      ggplotly(g1)
-    }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Conocida'& input$conditioned_means == 'Media no condicionada'){
-      g2 = fx_norm_n(t0 = input$T0 ,d = input$k , variance = input$variance, yn = input$yn ,n = input$numberObservations)
-      ggplotly(g2)
-    }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida' & input$conditioned_means == "Media condicionada"){
-      g3 = f_norm_uni(y_barn = input$y_barn, S_y = input$S_y, mu0 = input$M0, kappa_0 = input$kappa_0, alpha_0 = input$alpha, beta_0 = input$beta_, n = input$numberObservations)
-      ggplotly(g3)
-    }
+  observeEvent(input$buttonGraph, {
+    
+    output$distPlot<- renderPlotly({
+      if(input$cono_parametros_med == 'Conocida' & input$cono_parametros_var == 'Desconocida'){
+        g1 = fy_ivgamma(a = input$Alpha, b = input$Beta,
+                        theta = input$mean ,n= input$numberObservations,s_2 =  input$sigma_n)
+        ggplotly(g1[[1]])
+      }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Conocida'){
+        g2 = fx_norm_n(t0 = input$T0 ,d = input$k , variance = input$variance, yn = input$yn ,n = input$numberObservations)
+        ggplotly(g2)
+      }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida' & input$conditioned_means == 'Media condicionada'){
+        #g3 = f_norm_uni(26.21,115.35,25,1/5,0.1,0.2,66)
+        #g3 = f_norm_uni(26.21,115.35,25,1/5,1,5,66) # prueba info
+        g3 = f_norm_uni(y_barn = input$yn_3,S_y = input$sn_2_3,mu0 = input$mu0_3,kappa_0 = input$kappa_3,
+                        alpha_0 =input$Alpha_3 ,beta_0 = input$Beta_3,n = input$numberObservations)
+        ggplotly(g3[[1]],autorange="TRUE")
+      }
+      
+      
+    })
+    output$distPlot2 <- renderPlotly({
+      if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida' & input$conditioned_means == 'Media condicionada'){
+        g3 = f_norm_uni(y_barn = input$yn_3,S_y = input$sn_2_3,mu0 =input$mu0_3 ,kappa_0 =input$kappa_3 ,
+                        alpha_0 = input$Alpha_3,beta_0 =input$Beta_3 ,n = input$numberObservations)
+        ggplotly(g3[[2]],autorange="TRUE")
+      }else if(input$cono_parametros_med == 'Conocida' & input$cono_parametros_var == 'Desconocida'){
+        g3 = fy_ivgamma(a = input$Alpha, b = input$Beta,
+                        theta = input$mean ,n= input$numberObservations,s_2 =  input$sigma_n)
+        ggplotly(g3[[2]])
+      }
+    })
+    output$distPlot3 <- renderPlotly({
+      if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida' & input$conditioned_means == 'Media condicionada'){
+        g3 = f_norm_uni(y_barn = input$yn_3,S_y = input$sn_2_3,mu0 =input$mu0_3 ,kappa_0 =input$kappa_3 ,
+                        alpha_0 = input$Alpha_3,beta_0 =input$Beta_3 ,n = input$numberObservations)
+        ggplotly(g3[[3]],autorange="TRUE")
+      }else if(input$cono_parametros_med == 'Conocida' & input$cono_parametros_var == 'Desconocida'){
+        g3 = fy_ivgamma(a = input$Alpha, b = input$Beta,
+                        theta = input$mean ,n= input$numberObservations,s_2 =  input$sigma_n)
+        ggplotly(g3[[3]])
+      }
+    })
   })
-
   
-}
+})
+
+
 
 
