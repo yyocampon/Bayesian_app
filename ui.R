@@ -11,28 +11,39 @@ shinyUI(fluidPage(
     sidebarLayout(
         
         sidebarPanel(
-            
-            numericInput("numberObservations",
-                         "Ingrese la cantidad de observaciones",
-                         value = 1),
-            
-            
-            selectInput("cono_parametros_med",
-                        "Media: escoge el escenario",
+          
+            selectInput(inputId = "modelo_conj",
+                        "Escoge modelo conjugado",
                         selected = "",
-                        choices = c("","Conocida","Desconocida")
+                        choices = c("","Normal","Poisson","Binomial")
             ),
-            selectInput(inputId = "cono_parametros_var",
-                        label = "Varianza: escoge el escenario",                            
-                        selected = "",
-                        choices = c("","Conocida","Desconocida")
+            
+            conditionalPanel(condition = "input.modelo_conj !='Binomial'",
+                  numericInput("numberObservations",
+                  "Ingrese la cantidad de observaciones",
+                  value = 1),
             ),
+            
+            conditionalPanel(condition = "input.modelo_conj=='Normal'",
+              selectInput("cono_parametros_med",
+                "Media: escoge el escenario",
+                selected = "",
+                choices = c("","Conocida","Desconocida")
+              ),
+              
+             selectInput(inputId = "cono_parametros_var",
+                label = "Varianza: escoge el escenario",                            
+                selected = "",
+                choices = c("","Conocida","Desconocida")
+                )
+            ),
+            
             conditionalPanel(condition = "input.cono_parametros_med=='Desconocida' & input.cono_parametros_var=='Desconocida'",
-                             selectInput("conditioned_means",
-                                         "Media condicional: escoge el escenario",
-                                         selected = "Media condicionada",
-                                         choices = c("","Media condicionada","Media no condicionada")
-                             )
+                selectInput("conditioned_means",
+                 "Media condicional: escoge el escenario",
+                 selected = "Media condicionada",
+                 choices = c("","Media condicionada","Media no condicionada")
+                 )
             
             ),
             div(actionButton("buttonGraph", "Generar Gráfico"), align = "center"),
@@ -63,7 +74,7 @@ shinyUI(fluidPage(
             fluidRow(
                 column(4,
                        uiOutput("data_parameters_norm"),
-                       uiOutput("GraphTitle")
+
                 ),
                 column(8,
                        uiOutput("prior_parameters_norm")
@@ -86,9 +97,16 @@ shinyUI(fluidPage(
                            style = "display: none;",
                            withSpinner(plotlyOutput('distPlot3'))
                        )
+                ),
+                column(12,
+                        conditionalPanel(
+                          condition = "input.buttonGraph > 0",
+                          style = "display: none;",
+                          withSpinner(plotlyOutput('distPlot4'))
+                        )
                 )
             )
-        ),
+                          ),
         #tabPanel(title = "Teoria", htmlOutput("teoria"))
         #tabPanel("Teoria",includeHTML("include.html"))
         tabPanel(title = "Teoría",
@@ -97,8 +115,7 @@ shinyUI(fluidPage(
                  )
         )
         )
-        )
+      )
     )
-    
-)
+    )
 )

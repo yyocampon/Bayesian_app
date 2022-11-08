@@ -1,10 +1,7 @@
 library(ggplot2)
 library(invgamma)
 
-
-# Funciton to plot conjugate model with mean unkown -----------------------
-
-# Función para graficar modelo conjugado con media desconocida ----
+# Función para graficar modelo conjugado normal con media desconocida 
 fx_norm_n = function(t0,d,variance,yn,n){
   
   #Parámetros de entrada -----  
@@ -47,9 +44,8 @@ fx_norm_n = function(t0,d,variance,yn,n){
   
   p_1 #Gráfico
 }
-# Funciton to plot conjugate model with variance unkown -----------------------
 
-# Función para graficar el modelo conjugado con varianza desconocida ----
+# Función para graficar el modelo conjugado normal con varianza desconocida 
 fy_ivgamma <- function(a,b,theta,n,s_2){
   
   # Parámetros calculados  -------
@@ -83,7 +79,7 @@ fy_ivgamma <- function(a,b,theta,n,s_2){
   
   p_21 = ggplot(data=df4_red, aes(x=cuant_apr_sigma, y=den_apri_sigma)) + 
     geom_line(size = 0.8, col = 3) +
-    labs(color = "Dsitribución", y= "Densidad", x="Varianza")+
+    labs(color = "Distribución", y= "Densidad", x="Varianza")+
     ggtitle("varianza desconocida - A priori") +
     theme_bw()
   
@@ -99,15 +95,11 @@ fy_ivgamma <- function(a,b,theta,n,s_2){
     ggtitle("Varianza desconocida - Verosimilitud") +
     theme_bw()
   
-  #grid.arrange(p_21, p_22, p_23, ncol = 2, nrow = 2 )
   return(list(p_21,p_22,p_23))
 }
 
 
-fy_ivgamma(a = 1100, b = 250000,theta = 220,n=12, s_2 = 396.78)[[2]]
-# Function to plot conjugate model for conditional mean in the vari --------
-
-
+# Función para graficar modelo conjugado normal con media condicional en la varianza
 f_norm_uni = function(y_barn, S_y, mu0, kappa_0, alpha_0, beta_0, n){
   #Parámetros de entrada -----   
   # n: Tamaño de la muestra
@@ -193,6 +185,159 @@ f_norm_uni = function(y_barn, S_y, mu0, kappa_0, alpha_0, beta_0, n){
     ggtitle("Distribucion posterior", subtitle = "Varianza") +
     theme_bw()
   p_33
-  #grid.arrange(p_31, p_32, p_33, ncol = 2, nrow = 2 )
   return(list(p_31,p_32,p_33))
 }
+
+
+# Función para graficar modelo conjugado binomial
+fy_bin = function(n_ensayos,a,b,y){
+  # y: número de éxitos en los n ensayos bernoulli
+  
+  # Distribución de verosimilitud
+  y_val = 0:n_ensayos
+  theta_est = y/n_ensayos #Estimación muestral
+  fy1 = dbinom(y_val,n_ensayos,theta_est) #Densidades para la distribución de verosilimitud
+  df1 = data.frame(y_val, fy1 = fy1,yend= rep(0, length(y_val))) #Base de datos para distribución verosimilitud: valores en y - densidades
+  
+  # Parámetros a priori:
+  theta_val = seq(0.01,0.99,length.out = 10000)
+  fy2 = dbeta(x = theta_val, shape1 = a, shape2 = b) #Densidades para la distribución a priori
+  df2 = data.frame(theta_val,fy2)  #Base de datos para distribucón a priori : probabilidades - densidades
+  
+  #Parámetros posterior: 
+  a_pos = y + a 
+  b_pos = n_ensayos - y + b
+  theta_pos = rbeta(10000, shape1 = a_pos, shape2 = b_pos)
+  fy3 = dbeta(x = theta_val, shape1 = a_pos, shape2 = b_pos) 
+  df3 = data.frame(theta_val,fy3)
+  
+  limInf_vero = floor((n_ensayos*theta_est) - 3*sqrt(n_ensayos*theta_est*(1-theta_est)))
+  limSupe_vero = ceiling((n_ensayos*theta_est) + 3*sqrt(n_ensayos*theta_est*(1-theta_est)))
+  
+  if(limInf_vero < 0){
+    limInf_vero = min(y_val)
+  }else if(limSupe_vero > n_ensayos){
+    limSupe_vero = max(y_val)
+  }
+  
+  g_vero = ggplot(data=df1, aes(x=y_val, y=fy1, xend = y_val, yend = yend)) + 
+    geom_point(size = 0.8) +
+    geom_segment()+ 
+    labs(y= "Probabilidad", x= "y") +
+    ggtitle("Distribución de verosimilitud")+
+    scale_x_continuous(breaks=seq(limInf_vero,limSupe_vero, by = ceiling((limSupe_vero - limInf_vero)/10)),
+                       limits = c(limInf_vero,limSupe_vero)) +
+    scale_y_continuous(limits = c(0.0,(max(fy1)+0.02))) +
+    theme_bw()
+  
+  
+  g_1 = ggplot(data=df2, aes(x=theta_val, y=fy2)) + 
+    geom_line(size=0.8) +
+    labs(y= "Densidad", x= "Probabilidad de éxito") +
+    ggtitle("Distribución a priori") +
+    scale_x_continuous(breaks=seq(0,max(theta_val), by = 0.1),
+                       limits = c(0, (max(theta_val))))+
+    scale_y_continuous(
+      limits = c(min(fy2),(max(fy2)+0.05))) +
+    theme_bw()
+  
+  g_2 = ggplot(data = df3, aes(x=theta_val, y=fy3)) + 
+    geom_line(size=0.8) +
+    labs(y= "Densidad", x= "Probabilidad de éxito") +
+    ggtitle("Distribución posterior") +
+    scale_y_continuous(
+      limits = c(min(fy3),(max(fy3)+0.05))) +
+    scale_x_continuous(breaks=seq(0,max(theta_val), by = 0.1),
+                       limits = c(0, max(theta_val)))+
+    theme_bw()
+  
+  return(list(g_vero, g_1,g_2))
+}
+
+
+# fy_bin(980,1,1,437)
+# fy_bin(15,2,2,8)
+# fy_bin(230,3,2,168)
+# fy_bin(100,1,2,32)
+# fy_bin(40,3,7,29)
+# fy_bin(8,5,1,3)
+# fy_bin(10,0.5,0.5,7)
+# fy_bin(27,2,5,13)
+
+# Función para graficar modelo conjugado poisson
+fx_pois = function(nobs, theta_m, alpha_0, beta_0){
+  ## Likelihood:
+  like_pois_original <- rpois(n = 10000, lambda = theta_m)
+  ## Prior:
+  prior_pois <- rgamma(n = 10000, shape = alpha_0, rate = 1/beta_0)
+  ## Posterior:
+  like_pois <- sample(like_pois_original,size = nobs)
+  alpha_pos <- sum(like_pois) + alpha_0
+  beta_pos <- nobs + beta_0
+  post_pois <- rgamma(n = 10000, shape = alpha_pos, rate = 1/beta_pos)
+  
+  #### Posterior quantile:
+  x = seq(0.01,0.99,length.out = 10000)
+  
+  post_quantile = qgamma(p = x, shape = alpha_pos, scale = 1/beta_pos) 
+  den_post_quantile = dgamma(post_quantile, shape = alpha_pos, scale = 1/beta_pos) 
+  P = ecdf(post_quantile)
+  df4 = data.frame(post_quantile,den_post_quantile)
+  df4_red = df4[df4$post_quantile<post_quantile[min(which(P(post_quantile) > 0.99))],] 
+
+  
+  ### Graphics
+  ## Likelihood:
+  datos_like <- data.frame(x = like_pois_original, y = dpois(like_pois_original,theta_m))
+  
+  likelihood <- ggplot(data = data.frame(x =  datos_like[ ,1],
+                                         y =  datos_like[ ,2],
+                                         yend = rep(0,length( datos_like[,1]))),
+                       aes(x = x, y = y, xend = x, yend = yend)) +
+    geom_point(color = "blue") +
+    geom_segment(color = "blue") +
+    scale_x_continuous(name="\nx",
+                       breaks=seq(min(datos_like[ ,1]),max( datos_like[ ,1]), by = ceiling((max(datos_like[,1]) - min(datos_like[,1]))/5)),
+                       limits = c((min(datos_like[,1])-0.5), (max(datos_like[ ,1])+.05))) +
+    scale_y_continuous(name="Densidad\n",
+                       limits = c(0.0,(max( datos_like[ ,2]+.05)))) +
+    ggtitle("Poisson Likelihood") +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5),
+          text = element_text(size = 10))
+  
+  ## A priori:
+  data_prior <- data.frame(x = prior_pois, y = dgamma(prior_pois,shape = alpha_0, rate = 1/beta_0))
+  
+  prior <- ggplot(data = data_prior, aes(x = x, y = y)) + 
+    geom_line(color = "blue", size = 0.8) + theme_bw() + 
+    labs(title = "Prior distribution", y = "Densidad")
+  
+  # Posterior:
+  data_pos <- data.frame(x = post_pois, y = dgamma(post_pois,shape = alpha_pos, rate = 1/beta_pos))
+
+  media_posterior = alpha_pos/beta_pos
+  
+  posterior <- ggplot(data = data_pos, aes(x = x, y = y)) +
+    geom_line(color = "blue", size = 0.8) + theme_bw() +
+    labs(title = "Posterior distribution", y = "Densidad")+
+    geom_vline(xintercept = media_posterior) 
+
+  
+  posterior_q = ggplot(data = df4_red, aes(post_quantile,den_post_quantile))+
+    geom_line(size = 0.8, color = 3) +
+    labs(y= "Densidad", x="x")+
+    ggtitle("Distribucion posterior con cuantiles") +
+    geom_vline(xintercept = media_posterior) +
+    theme_bw()
+
+  
+  return(list(likelihood, prior,posterior,posterior_q))
+}
+
+# fx_pois(500,10,2,3)
+# fx_pois(50,2,1.5,2)
+# fx_pois(500,2,1,0.5)
+# fx_pois(5,2,1,1)
+# fx_pois(5000,0.1,2,2)
+# fx_pois(50,25,2,2)
