@@ -3,6 +3,8 @@ library(shinythemes)
 library(plotly)
 library(shinycssloaders)
 library(html5)
+library(ggplot2)
+library(invgamma)
 library(htmltools)
 library(markdown)
 

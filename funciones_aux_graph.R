@@ -1,6 +1,3 @@
-library(ggplot2)
-library(invgamma)
-
 # Función para graficar modelo conjugado normal con media desconocida 
 fx_norm_n = function(t0,d,variance,yn,n){
   
@@ -254,7 +251,6 @@ fy_bin = function(n_ensayos,a,b,y){
 
 }
 
-
 #fy_bin(980,1,1,437)
 # fy_bin(15,2,2,8)
 # fy_bin(230,3,2,168)
@@ -299,7 +295,7 @@ fx_pois = function(nobs, theta_m, alpha_0, beta_0){
     geom_segment(color = "blue") +
     scale_x_continuous(name="\nx",
                        breaks=seq(min(datos_like[ ,1]),max( datos_like[ ,1]), by = ceiling((max(datos_like[,1]) - min(datos_like[,1]))/5)),
-                       limits = c((min(datos_like[,1])-0.5), (max(datos_like[ ,1])+.05))) +
+                       limits = c((min(datos_like[,1])), (max(datos_like[ ,1])))) +
     scale_y_continuous(name="Densidad\n",
                        limits = c(0.0,(max( datos_like[ ,2]+.05)))) +
     ggtitle("Poisson Likelihood") +

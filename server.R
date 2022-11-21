@@ -13,7 +13,6 @@ source("funciones_aux_graph.R")
 shinyServer(function(input, output) {
   
   # generating inputs to likelihood dist with data set information
-  
   output$data_parameters_norm <- renderUI({
     if(input$modelo_conj == 'Normal'){
       if(input$cono_parametros_med == 'Conocida' & input$cono_parametros_var == 'Desconocida'){
@@ -68,7 +67,6 @@ shinyServer(function(input, output) {
   })
   
   # generating inputs to build aprior information
-  
   output$prior_parameters_norm <- renderUI({
     if(input$modelo_conj == 'Normal'){
       if(input$cono_parametros_med == 'Conocida' & input$cono_parametros_var == 'Desconocida'){
