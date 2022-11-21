@@ -1,6 +1,8 @@
 ---
 title: "Modelos normales bayesianos conjugados"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 <style>
@@ -66,14 +68,14 @@ A continuación se describe cada uno de los valores necesarios para el cálculo 
 Ambos valores son necesarios para simular el conjunto de datos.
 
 * **Media muestral** ($\bar{y}_n$):la media a priori se estima a partir de este valor, de la siguiente manera $\mu_0 = \bar{y}_n \pm d\sigma$
-* **Número de desviaciones estándar** ($d$): It indicates how many standard deviations we want the a priori mean of the sample mean. Indica cuántas desviaciones estándar queremos que tenga la media a priori de la muestra. Así, puede establecerse en un rango de $\pm 3$ desviaciones estándar con pasos de $0.5$.
+* **Número de desviaciones estándar** ($d$): Indica cuántas desviaciones estándar queremos que tenga la media a priori de la muestra. Así, puede establecerse en un rango de $\pm 3$ desviaciones estándar con pasos de $0.5$.
 * **Precisión de la distribución a priori** ($\tau_0$): Recordemos que la precisión es la inversa de la varianza, es decir, $\tau_0 = \frac{1}{\sigma^2}$.
 
 ### 3. Varianza desconocida: su estimación con media conocida
 
 #### **3.1 Verosimilitud**
 
-In this case, it is established that the sampling distribution for a vector of observations $\textbf{y} =(y_1,…,y_n )$ es una distribución Normal con media conocida y varianza desconocida, $\textbf{y} \overset{\text{i.i.d.}}{\sim} N(\theta, \sigma ^2)$,  es decir, la distribución de probabilidad viene dada por:
+En este caso, se establece que la distribución muestral para un vector de observaciones $\textbf{y} =(y_1,…,y_n )$ es una distribución Normal con media conocida y varianza desconocida, $\textbf{y} \overset{\text{i.i.d.}}{\sim} N(\theta, \sigma ^2)$,  es decir, la distribución de probabilidad viene dada por:
 
 <center>
 
@@ -111,7 +113,7 @@ A continuación se describe cada uno de los valores necesarios para el cálculo 
 * **Media conocida** ($\mu$): Es la varianza poblacional.
 * **Varianza muestral** ($s^2$): Variabilidad que queremos que tenga la distribución de verosimilitud.
  
-Both values are needed to simulate the data set.
+Ambos valores son necesarios para simular el conjunto de datos:
 
 * $\boldsymbol{\nu}$: Corresponde a las sumas al cuadrado de las diferencias entre los valores observados y la media conocida. Toma valores de 0,1 a 5, con paso de 0,1 y debe ser ingresada por el usuario.
 * **Primer hiperparámetro** $(\boldsymbol{\alpha})$: $\frac{\nu_0}{2}$. Es el parámetro de escala de la distribución a priori para $\sigma^2$.

@@ -156,7 +156,7 @@ shinyServer(function(input, output) {
                        min = 0),
           numericInput("Beta_bin",
                        HTML("Ingrese  &beta;"),
-                       value = 3,
+                       value = 1,
                        min=0)
         )
       )

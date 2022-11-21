@@ -207,7 +207,6 @@ fy_bin = function(n_ensayos,a,b,y){
   #Parámetros posterior: 
   a_pos = y + a 
   b_pos = n_ensayos - y + b
-  theta_pos = rbeta(10000, shape1 = a_pos, shape2 = b_pos)
   fy3 = dbeta(x = theta_val, shape1 = a_pos, shape2 = b_pos) 
   df3 = data.frame(theta_val,fy3)
   
@@ -251,11 +250,12 @@ fy_bin = function(n_ensayos,a,b,y){
                        limits = c(0, max(theta_val)))+
     theme_bw()
   
-  return(list(g_vero, g_1,g_2))
+    return(list(g_vero, g_1,g_2))
+
 }
 
 
-# fy_bin(980,1,1,437)
+#fy_bin(980,1,1,437)
 # fy_bin(15,2,2,8)
 # fy_bin(230,3,2,168)
 # fy_bin(100,1,2,32)
@@ -269,23 +269,24 @@ fx_pois = function(nobs, theta_m, alpha_0, beta_0){
   ## Likelihood:
   like_pois_original <- rpois(n = 10000, lambda = theta_m)
   ## Prior:
-  prior_pois <- rgamma(n = 10000, shape = alpha_0, rate = 1/beta_0)
+  #prior_pois <- rgamma(n = 10000, shape = alpha_0, rate = 1/beta_0)
+  prior_pois <- rgamma(n = 10000, shape = alpha_0, rate = beta_0)
   ## Posterior:
   like_pois <- sample(like_pois_original,size = nobs)
   alpha_pos <- sum(like_pois) + alpha_0
   beta_pos <- nobs + beta_0
-  post_pois <- rgamma(n = 10000, shape = alpha_pos, rate = 1/beta_pos)
+  # post_pois <- rgamma(n = 10000, shape = alpha_pos, rate = 1/beta_pos)
+  post_pois <- rgamma(n = 10000, shape = alpha_pos, rate = beta_pos)
   
   #### Posterior quantile:
-  x = seq(0.01,0.99,length.out = 10000)
+  x = seq(0.001,1,length.out = 10000)
   
-  post_quantile = qgamma(p = x, shape = alpha_pos, scale = 1/beta_pos) 
-  den_post_quantile = dgamma(post_quantile, shape = alpha_pos, scale = 1/beta_pos) 
+  post_quantile = qgamma(p = x, shape = alpha_pos, rate = beta_pos) 
+  den_post_quantile = dgamma(post_quantile, shape = alpha_pos, rate = beta_pos) 
   P = ecdf(post_quantile)
   df4 = data.frame(post_quantile,den_post_quantile)
   df4_red = df4[df4$post_quantile<post_quantile[min(which(P(post_quantile) > 0.99))],] 
 
-  
   ### Graphics
   ## Likelihood:
   datos_like <- data.frame(x = like_pois_original, y = dpois(like_pois_original,theta_m))
@@ -306,38 +307,45 @@ fx_pois = function(nobs, theta_m, alpha_0, beta_0){
     theme(plot.title = element_text(hjust = 0.5),
           text = element_text(size = 10))
   
+  #data_prior <- data.frame(x = prior_pois, y = dgamma(prior_pois,shape = alpha_0, rate = 1/beta_0))
   ## A priori:
-  data_prior <- data.frame(x = prior_pois, y = dgamma(prior_pois,shape = alpha_0, rate = 1/beta_0))
+  data_prior <- data.frame(x = prior_pois, y = dgamma(prior_pois,shape = alpha_0, rate = beta_0))
   
   prior <- ggplot(data = data_prior, aes(x = x, y = y)) + 
     geom_line(color = "blue", size = 0.8) + theme_bw() + 
     labs(title = "Prior distribution", y = "Densidad")
   
+  #data_pos <- data.frame(x = post_pois, y = dgamma(post_pois,shape = alpha_pos, rate = 1/beta_pos))
   # Posterior:
-  data_pos <- data.frame(x = post_pois, y = dgamma(post_pois,shape = alpha_pos, rate = 1/beta_pos))
+  data_pos <- data.frame(x = post_pois, y = dgamma(post_pois,shape = alpha_pos, rate = beta_pos))
 
   media_posterior = alpha_pos/beta_pos
   
   posterior <- ggplot(data = data_pos, aes(x = x, y = y)) +
     geom_line(color = "blue", size = 0.8) + theme_bw() +
     labs(title = "Posterior distribution", y = "Densidad")+
-    geom_vline(xintercept = media_posterior) 
-
+    geom_vline(xintercept = media_posterior) +
+    annotate("text", x = mean(data_pos$x) + 3*sd(data_pos$x), 
+             y = mean(data_pos$y),
+             label = paste("μ:", round(media_posterior,3),
+                           "\n α:",round(alpha_pos,3),
+                           "\n β:",round(beta_pos,3)))
   
   posterior_q = ggplot(data = df4_red, aes(post_quantile,den_post_quantile))+
     geom_line(size = 0.8, color = 3) +
     labs(y= "Densidad", x="x")+
-    ggtitle("Distribucion posterior con cuantiles") +
+    ggtitle("Posterior con cuantiles") +
     geom_vline(xintercept = media_posterior) +
     theme_bw()
 
-  
-  return(list(likelihood, prior,posterior,posterior_q))
+  #return(list(likelihood, prior,posterior,posterior_q))
+  gridExtra::grid.arrange(likelihood,prior,posterior,posterior_q, nrow =2)
+ 
 }
 
-# fx_pois(500,10,2,3)
-# fx_pois(50,2,1.5,2)
-# fx_pois(500,2,1,0.5)
+# fx_pois(500,10,1,0.5)
+# fx_pois(50,8,2,2)
+# fx_pois(500,28,3,1)
 # fx_pois(5,2,1,1)
-# fx_pois(5000,0.1,2,2)
-# fx_pois(50,25,2,2)
+# fx_pois(5000,150,3,1.2)
+# fx_pois(50,25,1,2)
