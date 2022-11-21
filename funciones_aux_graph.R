@@ -338,8 +338,8 @@ fx_pois = function(nobs, theta_m, alpha_0, beta_0){
     geom_vline(xintercept = media_posterior) +
     theme_bw()
 
-  #return(list(likelihood, prior,posterior,posterior_q))
-  gridExtra::grid.arrange(likelihood,prior,posterior,posterior_q, nrow =2)
+  return(list(likelihood, prior,posterior,posterior_q))
+  #gridExtra::grid.arrange(likelihood,prior,posterior,posterior_q, nrow =2)
  
 }
 
