@@ -298,7 +298,7 @@ fx_pois = function(nobs, theta_m, alpha_0, beta_0){
                        limits = c((min(datos_like[,1])), (max(datos_like[ ,1])))) +
     scale_y_continuous(name="Densidad\n",
                        limits = c(0.0,(max( datos_like[ ,2]+.05)))) +
-    ggtitle("Poisson Likelihood") +
+    ggtitle("Distribución de verosimilitud") +
     theme_bw() +
     theme(plot.title = element_text(hjust = 0.5),
           text = element_text(size = 10))
@@ -309,7 +309,7 @@ fx_pois = function(nobs, theta_m, alpha_0, beta_0){
   
   prior <- ggplot(data = data_prior, aes(x = x, y = y)) + 
     geom_line(color = "blue", size = 0.8) + theme_bw() + 
-    labs(title = "Prior distribution", y = "Densidad")
+    labs(title = "Distribución a priori", y = "Densidad")
   
   #data_pos <- data.frame(x = post_pois, y = dgamma(post_pois,shape = alpha_pos, rate = 1/beta_pos))
   # Posterior:
@@ -319,7 +319,7 @@ fx_pois = function(nobs, theta_m, alpha_0, beta_0){
   
   posterior <- ggplot(data = data_pos, aes(x = x, y = y)) +
     geom_line(color = "blue", size = 0.8) + theme_bw() +
-    labs(title = "Posterior distribution", y = "Densidad")+
+    labs(title = "Distribución posterior", y = "Densidad")+
     geom_vline(xintercept = media_posterior) +
     annotate("text", x = mean(data_pos$x) + 3*sd(data_pos$x), 
              y = mean(data_pos$y),
