@@ -99,13 +99,6 @@ shinyUI(fluidPage(
                                       style = "display: none;",
                                       withSpinner(plotlyOutput('distPlot3'))
                                     )
-                             ),
-                             column(12,
-                                    conditionalPanel(
-                                      condition = "input.buttonGraph > 0",
-                                      style = "display: none;",
-                                      withSpinner(plotlyOutput('distPlot4'))
-                                    )
                              )
                            )
                   ), # scrolling = yes

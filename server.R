@@ -231,13 +231,6 @@ shinyServer(function(input, output) {
       }
     })
     
-    output$distPlot4 <- renderPlotly({
-      if(input$modelo_conj == 'Poisson'){
-        pois_pos = fx_pois(nobs=input$numberObservations, theta_m=input$theta, alpha_0=input$Alpha_pois,
-                           beta_0=input$Beta_pois)
-        ggplotly(pois_pos[[4]])}
-    })
-    
   })
   
 })
