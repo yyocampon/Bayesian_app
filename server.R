@@ -3,7 +3,7 @@ library(invgamma)
 library(ggplot2)
 library(plotly)
 library(gridExtra)
-#library(markdown)
+
 
 # source where there are auxiliary functions to plot densities
 
@@ -213,7 +213,7 @@ shinyServer(function(input, output) {
     output$distPlot3 <- renderPlotly({
       if(input$modelo_conj == 'Normal'){
         if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida' & input$conditioned_means == 'Media condicionada'){
-          g3 = f_norm_uni(y_barn = input$yn_3,S_y = input$sn_2_3,mu0 =input$mu0_3 ,kappa_0 =input$kappa_3 ,
+          g3 = f_norm_uni(y_barn = input$yn_3, S_y = input$sn_2_3, mu0 =input$mu0_3,kappa_0 =input$kappa_3 ,
                           alpha_0 = input$Alpha_3,beta_0 =input$Beta_3 ,n = input$numberObservations)
           ggplotly(g3[[3]],autorange="TRUE")
         }else if(input$cono_parametros_med == 'Conocida' & input$cono_parametros_var == 'Desconocida'){

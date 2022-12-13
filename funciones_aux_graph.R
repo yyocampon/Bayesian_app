@@ -95,7 +95,6 @@ fy_ivgamma <- function(a,b,theta,n,s_2){
   return(list(p_21,p_22,p_23))
 }
 
-
 # Función para graficar modelo conjugado normal con media condicional en la varianza
 f_norm_uni = function(y_barn, S_y, mu0, kappa_0, alpha_0, beta_0, n){
   #Parámetros de entrada -----   
@@ -153,7 +152,7 @@ f_norm_uni = function(y_barn, S_y, mu0, kappa_0, alpha_0, beta_0, n){
   #Parámetros para posterior de theta ------
   gl = n + nu_0 # Grados de libertad
   mu_n = ((mu0*kappa_0)+(n*y_barn))/(kappa_n) #Media de la distribución psoterior
-  val_theta = rt(1000,gl) *sqrt(sigma_n2/(n+kappa_0))+ mu_n #Muestra para distribución posterior de theta
+  val_theta = rt(1000,gl) * sqrt(sigma_n2/(n+kappa_0))+ mu_n #Muestra para distribución posterior de theta
   densidades = density(val_theta) # Densidades muestrales
   df3 = data.frame(densidades$x, densidades$y) # Base de datos para distribución posterior de theta
   
@@ -185,12 +184,11 @@ f_norm_uni = function(y_barn, S_y, mu0, kappa_0, alpha_0, beta_0, n){
   return(list(p_31,p_32,p_33))
 }
 
-
 # Función para graficar modelo conjugado binomial
 fy_bin = function(n_ensayos,a,b,y){
   # y: número de éxitos en los n ensayos bernoulli
   
-  # Distribución de verosimilitud
+  # Parámetros verosimilitud:
   y_val = 0:n_ensayos
   theta_est = y/n_ensayos #Estimación muestral
   fy1 = dbinom(y_val,n_ensayos,theta_est) #Densidades para la distribución de verosilimitud
@@ -206,6 +204,8 @@ fy_bin = function(n_ensayos,a,b,y){
   b_pos = n_ensayos - y + b
   fy3 = dbeta(x = theta_val, shape1 = a_pos, shape2 = b_pos) 
   df3 = data.frame(theta_val,fy3)
+  
+  #Gráfico verosimilitud
   
   limInf_vero = floor((n_ensayos*theta_est) - 3*sqrt(n_ensayos*theta_est*(1-theta_est)))
   limSupe_vero = ceiling((n_ensayos*theta_est) + 3*sqrt(n_ensayos*theta_est*(1-theta_est)))
@@ -223,28 +223,43 @@ fy_bin = function(n_ensayos,a,b,y){
     ggtitle("Distribución de verosimilitud")+
     scale_x_continuous(breaks=seq(limInf_vero,limSupe_vero, by = ceiling((limSupe_vero - limInf_vero)/10)),
                        limits = c(limInf_vero,limSupe_vero)) +
-    scale_y_continuous(limits = c(0.0,(max(fy1)+0.02))) +
+    scale_y_continuous(limits = c(0,(max(fy1)+0.02))) +
     theme_bw()
   
   
+  # Gráfico a priori
   g_1 = ggplot(data=df2, aes(x=theta_val, y=fy2)) + 
     geom_line(size=0.8) +
     labs(y= "Densidad", x= "Probabilidad de éxito") +
     ggtitle("Distribución a priori") +
     scale_x_continuous(breaks=seq(0,max(theta_val), by = 0.1),
-                       limits = c(0, (max(theta_val))))+
+                       limits = c(0,(max(theta_val))))+
     scale_y_continuous(
-      limits = c(min(fy2),(max(fy2)+0.05))) +
+      limits = c(0,(max(fy2)+0.05))) +
     theme_bw()
+  
+  
+  #Gráfico posterior
+  
+  media_pos = a_pos / (a_pos+b_pos)
+  varianza_pos = (a_pos*b_pos)/((a_pos+b_pos)^2 * (a_pos+b_pos+1))
+  
+  limInf_pos = media_pos-3*sqrt(varianza_pos)
+  limSupe_pos = media_pos+3*sqrt(varianza_pos)
+  
+  if(limInf_pos < 0){
+    limInf_pos = min(theta_val)
+  }else if(limSupe_pos > 1){
+    limSupe_pos = max(theta_val)
+  }
   
   g_2 = ggplot(data = df3, aes(x=theta_val, y=fy3)) + 
     geom_line(size=0.8) +
     labs(y= "Densidad", x= "Probabilidad de éxito") +
     ggtitle("Distribución posterior") +
-    scale_y_continuous(
-      limits = c(min(fy3),(max(fy3)+0.05))) +
-    scale_x_continuous(breaks=seq(0,max(theta_val), by = 0.1),
-                       limits = c(0, max(theta_val)))+
+    scale_x_continuous(breaks = seq(round(limInf_pos,2),round(limSupe_pos,2), by = round(((limSupe_pos-limInf_pos)/5),2)),
+                       limits = c(limInf_pos,limSupe_pos))+
+    scale_y_continuous(limits = c(0,(max(fy3)+0.05))) +
     theme_bw()
   
     return(list(g_vero, g_1,g_2))
@@ -277,9 +292,10 @@ fx_pois = function(nobs, theta_m, alpha_0, beta_0){
     geom_segment(color = "blue") +
     scale_x_continuous(name="\nx",
                        breaks=seq(min(datos_like[ ,1]),max( datos_like[ ,1]), by = ceiling((max(datos_like[,1]) - min(datos_like[,1]))/5)),
-                       limits = c((min(datos_like[,1])), (max(datos_like[ ,1])))) +
+                       limits = c((min(datos_like[,1])),(max(datos_like[ ,1])))) +
     scale_y_continuous(name="Densidad\n",
-                       limits = c(0.0,(max( datos_like[ ,2]+.05)))) +
+                       breaks=seq(0,max( datos_like[ ,2]), by = round(((max(datos_like[,2]) - min(datos_like[,2]))/5),2)), 
+                       limits = c(0,(max(datos_like[ ,2])))) +
     ggtitle("Distribución de verosimilitud") +
     theme_bw() +
     theme(plot.title = element_text(hjust = 0.5),
@@ -290,16 +306,28 @@ fx_pois = function(nobs, theta_m, alpha_0, beta_0){
   
   prior <- ggplot(data = data_prior, aes(x = x, y = y)) + 
     geom_line(color = "blue", size = 0.8) + theme_bw() + 
-    labs(title = "Distribución a priori", y = "Densidad")
+    labs(title = "Distribución a priori", y = "Densidad") +
+    scale_x_continuous(
+      breaks=seq(round(min(data_prior[ ,1]),1),round(max(data_prior[ ,1]),1), by = round(((max(data_prior[,1]) - min(data_prior[,1]))/5),1)),
+      limits = c(round(min(data_prior[,1]),1),round((max(data_prior[ ,1])),1))) +
+    scale_y_continuous(
+      breaks=seq(0,round(max(data_prior[ ,2]),1), by = round(((max(data_prior[,2]) - min(data_prior[,2]))/5),1)),
+      limits = c(0,round((max(data_prior[ ,2])),1)))
+  
+  
   
   # Posterior:
   data_pos <- data.frame(x = post_pois, y = dgamma(post_pois,shape = alpha_pos, rate = beta_pos))
-
-
+  
+  
   posterior <- ggplot(data = data_pos, aes(x = x, y = y)) +
     geom_line(color = "blue", size = 0.8) + theme_bw() +
-    labs(title = "Distribución posterior", y = "Densidad")
+    labs(title = "Distribución posterior", y = "Densidad") +
+    scale_x_continuous(
+      breaks=seq(round(min(data_pos[ ,1]),1),round(max(data_pos[ ,1]),1), by = round(((max(data_pos[,1]) - min(data_pos[,1]))/5),1)),
+      limits = c(round(min(data_pos[,1]),1),round((max(data_pos[ ,1])),1))) 
 
+  
   return(list(likelihood, prior,posterior))
 
 }

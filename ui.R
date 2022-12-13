@@ -2,10 +2,10 @@ library(shiny)
 library(shinythemes)
 library(plotly)
 library(shinycssloaders)
-library(html5)
+#library(html5)
 library(ggplot2)
 library(invgamma)
-library(htmltools)
+#library(htmltools)
 library(markdown)
 
 shinyUI(fluidPage(
@@ -65,7 +65,7 @@ shinyUI(fluidPage(
       tags$ul(
         tags$li(tags$a(href="mailto:iscramirezgu@unal.edu.co", "iscramirezgu@unal.edu.co"))
       ),
-      img(src="Imagenes/Logo_unal.png", height = 120, width = 160,HSPACE="20"),
+      img(src="Imagenes/Logo_unal.png", height = 120, width = 160,hspace="20"),
       img(src="Imagenes/Logo_esc_estadistica.png", height = 130, width = 130)
       #HTML('<center><img src="logo.png"></center>')
     ),
