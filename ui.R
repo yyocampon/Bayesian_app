@@ -14,7 +14,6 @@ shinyUI(fluidPage(
   sidebarLayout(
     
     sidebarPanel(
-      
       selectInput(inputId = "modelo_conj",
                   "Escoge modelo conjugado",
                   selected = "",
@@ -41,10 +40,9 @@ shinyUI(fluidPage(
                        )
       ),
       
-      conditionalPanel(condition = "input.cono_parametros_med=='Desconocida' & input.cono_parametros_var=='Desconocida'",
+      conditionalPanel(condition = "input.modelo_conj=='Normal' & input.cono_parametros_med=='Desconocida' & input.cono_parametros_var=='Desconocida'",
                        selectInput("conditioned_means",
                                    "Media condicional: escoge el escenario",
-                                   selected = "Media condicionada",
                                    choices = c("","Media condicionada","Media no condicionada")
                        )
                        
@@ -72,7 +70,7 @@ shinyUI(fluidPage(
     
     mainPanel(
       tabsetPanel(type = "pills",
-                  tabPanel(title = "Gráfico",
+                  tabPanel(title = "Grafico",
                            fluidRow(
                              column(4,
                                     uiOutput("data_parameters_norm"),
