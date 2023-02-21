@@ -108,7 +108,7 @@ shinyServer(function(input, output) {
           )
         )
         
-      }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida'){
+      }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida'& input$independence_priors == 'Aprioris dependientes: media condicionada'){
         fluidRow(
           column(6,
                  h5("Apriori parameters"),
@@ -126,6 +126,29 @@ shinyServer(function(input, output) {
                               value = 50,
                               min = 0),
                  numericInput("mu0_3",HTML("Ingrese  &mu;<sub>0</sub>"),
+                              value = 0.1,
+                              min = 0)
+                 
+          )
+        )
+      }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida' & input$independence_priors == 'Aprioris independientes'){
+        fluidRow(
+          column(6,
+                 h5(HTML("&sigma;<sub>0</sub><sup>2</sup> apriori parameters")),
+                 numericInput("Alpha_4",HTML("Ingrese  &alpha;"),
+                              value = 1,
+                              min = 0),
+                 numericInput("Beta_4",
+                              HTML("Ingrese  &beta;"),
+                              value = 2,
+                              min=0)
+          ),
+          column(6,
+                 h5(HTML("&mu; apriori parameters")),
+                 numericInput("sigma_4",HTML("Ingrese  &sigma;<sub>0</sub><sup>2</sup>"),
+                              value = 50,
+                              min = 0),
+                 numericInput("mu0_4",HTML("Ingrese  &mu;<sub>0</sub>"),
                               value = 0.1,
                               min = 0)
                  
@@ -174,11 +197,15 @@ shinyServer(function(input, output) {
         }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Conocida'){
           g2 = fx_norm_n(t0 = input$T0 ,d = input$k , variance = input$variance, yn = input$yn ,n = input$numberObservations)
           ggplotly(g2)
-        }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida' & input$conditioned_means == 'Media condicionada'){
+        }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida' & input$independence_priors == 'Aprioris dependientes: media condicionada'){
           g3 = f_norm_uni(y_barn = input$yn_3,S_y = input$sn_2_3,mu0 = input$mu0_3,kappa_0 = input$kappa_3,
                           alpha_0 =input$Alpha_3 ,beta_0 = input$Beta_3,n = input$numberObservations)
           ggplotly(g3[[1]],autorange="TRUE")
-        }
+        }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida' & input$independence_priors == 'Aprioris independientes'){
+          ex1 <- f_norm_esc1(y_barn = input$yn_3, S_y = input$sn_2_3, mu0 = input$mu0_4, sigma_0 = input$sigma_4, alpha_0 = input$Alpha_4, beta_0 = input$Beta_4, n = input$numberObservations)
+          ggplotly(ex1[[1]],autorange="TRUE")
+          }
+        
       }else if(input$modelo_conj == 'Poisson'){
         pois_vero = fx_pois(nobs=input$numberObservations, theta_m=input$theta, alpha_0=input$Alpha_pois,
                     beta_0=input$Beta_pois)
@@ -191,7 +218,7 @@ shinyServer(function(input, output) {
     
     output$distPlot2 <- renderPlotly({
       if(input$modelo_conj == 'Normal'){
-        if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida' & input$conditioned_means == 'Media condicionada'){
+        if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida' & input$independence_priors == 'Aprioris dependientes: media condicionada'){
           g3 = f_norm_uni(y_barn = input$yn_3,S_y = input$sn_2_3,mu0 =input$mu0_3 ,kappa_0 =input$kappa_3 ,
                           alpha_0 = input$Alpha_3,beta_0 =input$Beta_3 ,n = input$numberObservations)
           ggplotly(g3[[2]],autorange="TRUE")
@@ -199,6 +226,9 @@ shinyServer(function(input, output) {
           g3 = fy_ivgamma(a = input$Alpha, b = input$Beta,
                           theta = input$mean ,n= input$numberObservations,s_2 =  input$sigma_n)
           ggplotly(g3[[2]])
+        }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida' & input$independence_priors == 'Aprioris independientes'){
+          ex1 <- f_norm_esc1(y_barn = input$yn_3, S_y = input$sn_2_3, mu0 = input$mu0_4, sigma_0 = input$sigma_4, alpha_0 = input$Alpha_4, beta_0 = input$Beta_4, n = input$numberObservations)
+          ggplotly(ex1[[2]],autorange="TRUE")
         }
       }else if(input$modelo_conj == 'Poisson'){
         pois_ap = fx_pois(nobs=input$numberObservations, theta_m=input$theta, alpha_0=input$Alpha_pois,
@@ -212,7 +242,7 @@ shinyServer(function(input, output) {
     
     output$distPlot3 <- renderPlotly({
       if(input$modelo_conj == 'Normal'){
-        if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida' & input$conditioned_means == 'Media condicionada'){
+        if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida' & input$independence_priors == 'Aprioris dependientes: media condicionada'){
           g3 = f_norm_uni(y_barn = input$yn_3, S_y = input$sn_2_3, mu0 =input$mu0_3,kappa_0 =input$kappa_3 ,
                           alpha_0 = input$Alpha_3,beta_0 =input$Beta_3 ,n = input$numberObservations)
           ggplotly(g3[[3]],autorange="TRUE")
@@ -220,6 +250,9 @@ shinyServer(function(input, output) {
           g3 = fy_ivgamma(a = input$Alpha, b = input$Beta,
                           theta = input$mean ,n= input$numberObservations,s_2 =  input$sigma_n)
           ggplotly(g3[[3]])
+        }else if(input$cono_parametros_med == 'Desconocida' & input$cono_parametros_var == 'Desconocida' & input$independence_priors == 'Aprioris independientes'){
+          ex1 <- f_norm_esc1(y_barn = input$yn_3, S_y = input$sn_2_3, mu0 = input$mu0_4, sigma_0 = input$sigma_4, alpha_0 = input$Alpha_4, beta_0 = input$Beta_4, n = input$numberObservations)
+          ggplotly(ex1[[3]],autorange="TRUE")
         }
       }else if(input$modelo_conj == 'Poisson'){
         pois_pos = fx_pois(nobs=input$numberObservations, theta_m=input$theta, alpha_0=input$Alpha_pois,

@@ -38,15 +38,18 @@ shinyUI(fluidPage(
                                    selected = "",
                                    choices = c("","Conocida","Desconocida")
                        )
+                       
       ),
       
       conditionalPanel(condition = "input.modelo_conj=='Normal' & input.cono_parametros_med=='Desconocida' & input.cono_parametros_var=='Desconocida'",
-                       selectInput("conditioned_means",
-                                   "Media condicional: escoge el escenario",
-                                   choices = c("","Media condicionada","Media no condicionada")
+                       selectInput(inputId = "independence_priors",
+                                   label = "Independencia de aprioris: escoge el escenario",
+                                   selected = "",
+                                   choices = c("","Aprioris dependientes: media condicionada","Aprioris independientes")
                        )
-                       
       ),
+      
+      
       div(actionButton("buttonGraph", "Generar Gráfico"), align = "center"),
       h5("Integrantes:"),
       tags$ul(

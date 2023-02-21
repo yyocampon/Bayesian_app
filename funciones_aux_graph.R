@@ -184,6 +184,101 @@ f_norm_uni = function(y_barn, S_y, mu0, kappa_0, alpha_0, beta_0, n){
   return(list(p_31,p_32,p_33))
 }
 
+### ---------- MODELO NORMAL: Escenario 1 ----------------------------
+
+f_norm_esc1 = function(y_barn, S_y, mu0, sigma_0, alpha_0, beta_0, n){
+  #Parámetros de entrada -----   
+  # n: Tamaño de la muestra
+  # mu0: Representa la media de la distribución a priori.
+  # y_barn: Media muestral (Verosimilitud)
+  # S_y: Varianza muestral (Verosimilitud)
+  #sigma_0: Varianza de la distribución a priori de theta.
+  # alpha_0: Parámetro de forma para la distribución a priori de sigma^2
+  # beta_0: Parámetro de escala para la distribución a priori de sigma^2
+  
+  #Distribución de verosimilitud ----
+  val_vero = rnorm(10000,mean = y_barn, sd = sqrt(S_y)) # Muestra para verosimilitud
+  densfy1 = density(val_vero)
+  fy1 = densfy1$y #Densidades de los valores muestrales
+  df1 = data.frame(densfy1$x, densfy1$y) #Base de datos para verosimilitud: valores en X y densidades
+  
+  # Aprior de theta:
+  val_apriori_theta = rnorm(10000, mean=mu0, sd=sqrt(sigma_0)) #Muestra para a priori
+  densfy2 = density(val_apriori_theta) 
+  fy2 = densfy2$y #Densidades muestrales
+  df2 = data.frame(densfy2$x, densfy2$y) # Base de datos para distribución a priori: valores en X y densidades
+  
+  x = seq(0.01,0.99,length.out = 10000) # Secuencia de cuantiles desde 0.01 hasta 0.99
+  
+  #Parámetros para a priori de sigma ----
+  cuant_apr_sigma = qinvgamma(p = x, shape = alpha_0, scale = 1/beta_0) #Valores de la distribución a priori
+  den_apri_sigma = dinvgamma(cuant_apr_sigma, shape = alpha_0, scale = 1/beta_0) #Densidades muestrales
+  P = ecdf(cuant_apr_sigma)
+  df4 = data.frame(cuant_apr_sigma,den_apri_sigma)
+  df4_red = df4[df4$cuant_apr_sigma<cuant_apr_sigma[min(which(P(cuant_apr_sigma) > 0.99))],] #Base de datos filtrada con valores hasta el cuantil 99 para distribuci?n a priori
+  
+  #Parámetros para posterior de sigma ----
+  s_2 <- var(val_vero)
+  alpha_n = (n-1)/2  #Parámetro de forma para la distribución posterior
+  beta_n = ((n-1)*s_2)/2 #Parámetro de escala para distribución psoterior
+  
+  ##  --- Normal
+  # cuant_post_sigma = rinvgamma(10000, shape= alpha_n, scale = 1/beta_n) #Valores de la distribución posterior
+  # den_post_sigma = density(cuant_post_sigma) #Densidades de la distribución
+  # df5 = data.frame(den_post_sigma$x, den_post_sigma$y) #Base de datos para distribución posterior de sigma
+  
+  ## ----- Con cuantiles:
+  cuant_pos_sigma = qinvgamma(p = x, shape = alpha_n, scale = 1/beta_n) #Valores de la distribución a priori
+  den_pos_sigma = dinvgamma(cuant_pos_sigma, shape = alpha_n, scale = 1/beta_n) #Densidades muestrales
+  P = ecdf(cuant_pos_sigma)
+  df5_ = data.frame(cuant_pos_sigma,den_pos_sigma)
+  df5 = df5_[df5_$cuant_pos_sigma<cuant_pos_sigma[min(which(P(cuant_pos_sigma) > 0.99))],]
+  
+  #Parámetros para posterior de theta ------
+  gl = n - 1 # Grados de libertad
+  y_bar_spos = mean(val_vero) #Media de la distribución psoterior
+  var_spos = s_2/n
+  val_theta = rt(1000,gl) *sqrt(var_spos)+ y_bar_spos #Muestra para distribución posterior de theta
+  densidades = density(val_theta) # Densidades muestrales
+  df3 = data.frame(densidades$x, densidades$y) # Base de datos para distribución posterior de theta
+  
+  #Gráfico para cada parámetro -----
+  
+  # Gráfico para theta ----
+  p_31 = ggplot(data=df1, aes(x=densfy1.x, y=densfy1.y,colour="Likelihood")) +
+    geom_line(size = 0.8) +
+    geom_line(data = df2, aes(x=densfy2.x, y=densfy2.y,colour="A priori"), size=0.8) +
+    geom_line(data = df3, aes(x=densidades.x, y=densidades.y, colour="Posterior"), size=0.8)+
+    labs(color = "Distribución", y= "Densidad", x="Valores")+
+    ggtitle("Media y varianza desconocidos: distribuciones a priori independientes", subtitle = "Theta") +
+    theme_bw()
+  
+  # Gráfico para apriori de sigma ----
+  p_32 = ggplot(data = df4_red, aes(cuant_apr_sigma,den_apri_sigma))+
+    geom_line(size = 0.8, color = 3) +
+    labs(y= "Densidad", x="Varianzas")+
+    ggtitle("Distribucion a priori", subtitle = "Varianza") +
+    theme_bw()
+  
+  # Gráfico para posterior de sigma ----
+  
+  # --- Normal:
+  # p_33 = ggplot(data = df5, aes(den_post_sigma.x,den_post_sigma.y))+
+  #   geom_line(size = 0.8, color = 4) +
+  #   labs(y= "Densidad", x="Varianzas")+
+  #   ggtitle("Distribucion posterior", subtitle = "Varianza") +
+  #   theme_bw()
+  
+  # --- Con cuantiles:
+  p_33 = ggplot(data = df5, aes(cuant_pos_sigma,den_pos_sigma))+
+    geom_line(size = 0.8, color = 4) +
+    labs(y= "Densidad", x="Varianzas")+
+    ggtitle("Distribucion posterior", subtitle = "Varianza") +
+    theme_bw()
+  
+  return(list(p_31,p_32,p_33))
+}
+
 # Función para graficar modelo conjugado binomial
 fy_bin = function(n_ensayos,a,b,y){
   # y: número de éxitos en los n ensayos bernoulli
