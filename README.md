@@ -1,9 +1,17 @@
-# Bayesian_app
-This repository has the files to builld the Normal conjugate models in shiny app
+# Bayessian_app-version_2
 
-funciones_aux_graph: has some functios that allows to plot the posteriori distribution depending of the parameters in apriori en likelihood distributions.
+This repository has the files needed to build conjugate models in a shiny application.
 
-This a app has the graph functions to plot two scenarios:
+functions_aux_graph: It has some functions that allow to graph the posterior distribution depending on the prior parameters in the likelihood distributions.
 
-- Know mean and unknown variance
-- Unknown mean and known variance
+This application has the graphic functions to plot the following scenarios:
+
+- Normal model
+  - Known mean and unknown variance
+  - Unknown mean and known variance
+  - Unknown variance and unknown mean with its prior distribution depending on variance
+  - Mean’s prior distribution independent of variance’s prior distribution
+
+- Poisson model
+
+- Binomial model
